@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import type { DriversDoc, SourceRecord } from "../types";
+import type { DriversDoc } from "../types";
 import type { ModelRun } from "../lib/floodModel";
 
 interface Props {
@@ -8,7 +8,6 @@ interface Props {
   index: number;
   playing: boolean;
   reducedMotion: boolean;
-  sourceById: Record<string, SourceRecord>;
   onIndex: (i: number) => void;
   onTogglePlay: () => void;
 }
@@ -26,7 +25,6 @@ export function TimelinePanel({
   index,
   playing,
   reducedMotion,
-  sourceById,
   onIndex,
   onTogglePlay,
 }: Props) {
@@ -46,7 +44,6 @@ export function TimelinePanel({
     return { maxRain, maxTide, maxDepth, x, yRain, yTide, yDepth, barW };
   }, [days, run]);
 
-  const observationsForDay = drivers.observations.filter((o) => o.date === day?.date);
   const observationDates = new Set(drivers.observations.map((o) => o.date));
 
   return (
@@ -82,16 +79,24 @@ export function TimelinePanel({
 
       <svg viewBox={`0 0 ${W} ${H}`} className="chart" role="img" aria-label="Daily rainfall, tide and modelled mean water depth">
         {days.map((d, i) => (
-          <rect
-            key={d.date}
-            x={chart.x(i) - chart.barW / 2}
-            y={chart.yRain(d.rain_mm)}
-            width={chart.barW}
-            height={H - PAD_B - chart.yRain(d.rain_mm)}
-            fill={i === index ? "#7cc4ff" : "#37628a"}
-          >
-            <title>{`${d.date}: ${d.rain_mm} mm (schematic)`}</title>
-          </rect>
+          <g key={d.date} className="chart-day" onClick={() => onIndex(i)}>
+            {/* Full-height hit target so the chart itself is a date picker. */}
+            <rect
+              x={chart.x(i) - chart.barW / 2 - 1}
+              y={PAD_T}
+              width={chart.barW + 2}
+              height={H - PAD_B - PAD_T}
+              fill="transparent"
+            />
+            <rect
+              x={chart.x(i) - chart.barW / 2}
+              y={chart.yRain(d.rain_mm)}
+              width={chart.barW}
+              height={H - PAD_B - chart.yRain(d.rain_mm)}
+              fill={i === index ? "#7cc4ff" : "#37628a"}
+            />
+            <title>{`${d.date}: ${d.rain_mm} mm (schematic) - click to jump to this day`}</title>
+          </g>
         ))}
 
         <polyline
@@ -156,28 +161,6 @@ export function TimelinePanel({
             <dd>{run.provincialMeanDepthM[index].toFixed(2)} m <span className="tag tag-model">model</span></dd>
           </div>
         </dl>
-      )}
-
-      {observationsForDay.length > 0 && (
-        <div className="observations">
-          <h3>Reported on this date</h3>
-          {observationsForDay.map((o, i) => {
-            const src = sourceById[o.source];
-            return (
-              <blockquote key={i}>
-                <p>{o.text}</p>
-                {src && (
-                  <cite>
-                    <a href={src.url} target="_blank" rel="noreferrer noopener">
-                      {src.publisher}
-                    </a>
-                    , {src.date}
-                  </cite>
-                )}
-              </blockquote>
-            );
-          })}
-        </div>
       )}
 
       <p className="panel-foot">

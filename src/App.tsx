@@ -11,10 +11,13 @@ import { TimelinePanel } from "./components/TimelinePanel";
 import { DetailsPanel } from "./components/DetailsPanel";
 import { TourControls } from "./components/TourControls";
 import { DataNotice, ModelPanel, SetupNotice, SourcesPanel } from "./components/InfoPanels";
+import { DateNavigator } from "./components/DateNavigator";
+import { buildDayRecords, type DayFilter } from "./lib/eventDays";
 import { loadAppData } from "./lib/dataLoader";
 import { pointInRing } from "./lib/geo";
 import { LAYER_ORDER } from "./lib/palette";
 import {
+  compareTideCounterfactual,
   qualitativeCheck,
   runFloodModel,
   summariseCorrelations,
@@ -53,6 +56,7 @@ export default function App() {
   const [touring, setTouring] = useState(false);
   const [cameraTarget, setCameraTarget] = useState<CameraPose | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [dayFilter, setDayFilter] = useState<DayFilter>("all");
 
   const sceneRef = useRef<FloodScene | null>(null);
 
@@ -77,8 +81,17 @@ export default function App() {
     () => (data && run ? summariseCorrelations(data.drivers.days, run) : null),
     [data, run],
   );
+  const counterfactual = useMemo(
+    () => (data ? compareTideCounterfactual(data.zones.features, data.drivers.days) : null),
+    [data],
+  );
   const checks = useMemo(
     () => (data && run ? qualitativeCheck(run, data.drivers.observations) : []),
+    [data, run],
+  );
+
+  const dayRecords = useMemo(
+    () => (data && run ? buildDayRecords(data.drivers, data.zones.features, run) : []),
     [data, run],
   );
 
@@ -189,7 +202,7 @@ export default function App() {
     );
   }
 
-  if (!data || !run || !correlation) {
+  if (!data || !run || !correlation || !counterfactual) {
     return (
       <div className="fatal">
         <h1>Bulacan flood control &mdash; 3D demonstration</h1>
@@ -251,13 +264,24 @@ export default function App() {
             />
           )}
 
+          <DateNavigator
+            records={dayRecords}
+            index={dayIndex}
+            filter={dayFilter}
+            sourceById={sourceById}
+            onIndex={(i) => {
+              setPlaying(false);
+              setDayIndex(i);
+            }}
+            onFilter={setDayFilter}
+          />
+
           <TimelinePanel
             drivers={data.drivers}
             run={run}
             index={dayIndex}
             playing={playing}
             reducedMotion={reducedMotion}
-            sourceById={sourceById}
             onIndex={setDayIndex}
             onTogglePlay={() => setPlaying((p) => !p)}
           />
@@ -316,7 +340,13 @@ export default function App() {
             </ul>
           </section>
 
-          <ModelPanel run={run} correlation={correlation} checks={checks} sourceById={sourceById} />
+          <ModelPanel
+            run={run}
+            correlation={correlation}
+            counterfactual={counterfactual}
+            checks={checks}
+            sourceById={sourceById}
+          />
           <DataNotice />
           <SourcesPanel sources={data.sources.sources} />
         </aside>

@@ -10,6 +10,7 @@ import {
   qualitativeCheck,
   runFloodModel,
   summariseCorrelations,
+  compareTideCounterfactual,
 } from "../src/lib/floodModel";
 import type { DriversDoc, FeatureCollection, FloodZoneFeature, ProjectFeature, WaterwayFeature } from "../src/types";
 import { pointInRing } from "../src/lib/geo";
@@ -117,11 +118,6 @@ describe("correlation helpers", () => {
     expect(summary.rainfallVsDepth).toHaveLength(4);
     expect(summary.tideVsDepth).toHaveLength(4);
     expect(summary.caveat).toMatch(/NOT evidence/);
-    expect(summary.tideConditional.wetDayCount).toBeGreaterThan(4);
-    expect(summary.tideConditional.meanDepthHighTideM).toBeGreaterThan(
-      summary.tideConditional.meanDepthLowTideM,
-    );
-    expect(summary.tideConditional.meanGateClosedHoursHighTide).toBeGreaterThan(0);
     for (const r of [...summary.rainfallVsDepth, ...summary.tideVsDepth]) {
       expect(r.r).toBeGreaterThanOrEqual(-1);
       expect(r.r).toBeLessThanOrEqual(1);
@@ -136,6 +132,40 @@ describe("correlation helpers", () => {
       expect(c.modelledZonesFloodedFraction).not.toBeNull();
       expect(c.source).toBeTruthy();
     }
+  });
+});
+
+describe("tide counterfactual", () => {
+  it("pins the calm run at the month's lowest modelled tide", () => {
+    const cf = compareTideCounterfactual(zones.features, drivers.days);
+    expect(cf.baselineTideM).toBe(Math.min(...drivers.days.map((d) => d.tide_max_m)));
+    expect(cf.method).toMatch(/not a measured or observed quantity/);
+  });
+
+  it("shuts the outfalls less often, and never more, without the real tide", () => {
+    const cf = compareTideCounterfactual(zones.features, drivers.days);
+    expect(cf.meanGateClosedHoursCounterfactual).toBeLessThan(cf.meanGateClosedHoursActual);
+  });
+
+  it("never leaves the calm-tide run wetter than the real-tide run", () => {
+    const cf = compareTideCounterfactual(zones.features, drivers.days);
+    expect(cf.meanDepthCounterfactualM).toBeLessThanOrEqual(cf.meanDepthActualM);
+    expect(cf.peakDepthCounterfactualM).toBeLessThanOrEqual(cf.peakDepthActualM);
+    expect(cf.extraZoneDaysFromTide).toBeGreaterThanOrEqual(0);
+    expect(cf.floodedZoneDaysActual - cf.floodedZoneDaysCounterfactual).toBe(cf.extraZoneDaysFromTide);
+  });
+
+  it("recovers a tide effect on a series where the tide is the only thing that varies", () => {
+    // Same rain every day; only the bay changes. The model must show the
+    // difference, otherwise the counterfactual is not measuring anything.
+    const flat = drivers.days.map((d) => ({ ...d, rain_mm: 45, tide_max_m: 1.05 }));
+    const cf = compareTideCounterfactual(zones.features, flat);
+    expect(cf.baselineTideM).toBe(1.05);
+    expect(cf.meanDepthCounterfactualM).toBe(cf.meanDepthActualM);
+
+    const varied = drivers.days.map((d, i) => ({ ...d, rain_mm: 45, tide_max_m: i % 2 ? 1.4 : 0.35 }));
+    const cf2 = compareTideCounterfactual(zones.features, varied);
+    expect(cf2.meanDepthActualM).toBeGreaterThan(cf2.meanDepthCounterfactualM);
   });
 });
 

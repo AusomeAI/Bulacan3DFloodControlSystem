@@ -1,5 +1,5 @@
 import type { SourceRecord } from "../types";
-import type { CorrelationSummary, ModelRun, QualitativeCheck } from "../lib/floodModel";
+import type { CorrelationSummary, ModelRun, QualitativeCheck, TideCounterfactual } from "../lib/floodModel";
 import { DEPTH_EXAGGERATION } from "../lib/constants";
 
 export type ViewMode = "3d" | "fallback";
@@ -91,11 +91,12 @@ export function DataNotice() {
 interface ModelPanelProps {
   run: ModelRun;
   correlation: CorrelationSummary;
+  counterfactual: TideCounterfactual;
   checks: QualitativeCheck[];
   sourceById: Record<string, SourceRecord>;
 }
 
-export function ModelPanel({ run, correlation, checks, sourceById }: ModelPanelProps) {
+export function ModelPanel({ run, correlation, counterfactual, checks, sourceById }: ModelPanelProps) {
   const fmt = (r: number) => (r >= 0 ? "+" : "") + r.toFixed(2);
   return (
     <section className="panel" aria-labelledby="model-heading">
@@ -135,15 +136,50 @@ export function ModelPanel({ run, correlation, checks, sourceById }: ModelPanelP
         day&rsquo;s rain can leave.
       </p>
 
-      <h3>The tide&rsquo;s role, conditioned on rain</h3>
+      <h3>The tide&rsquo;s role, by counterfactual</h3>
       <p>
-        Across the {correlation.tideConditional.wetDayCount} wettest days in the series, mean modelled depth was{" "}
-        <strong>{correlation.tideConditional.meanDepthHighTideM.toFixed(2)} m</strong> when the tide was above its
-        median and <strong>{correlation.tideConditional.meanDepthLowTideM.toFixed(2)} m</strong> when it was below
-        &mdash; a factor of {correlation.tideConditional.ratio.toFixed(2)}. On those high-tide wet days the gravity
-        outfalls were modelled shut for {correlation.tideConditional.meanGateClosedHoursHighTide.toFixed(1)} hours a
-        day on average across all zones: the same rain leaves deeper water behind when the bay is high.
+        So the model is re-run on the <em>same</em> rainfall with the bay pinned at the calmest tide of the month
+        ({counterfactual.baselineTideM.toFixed(2)} m). Everything else is identical, so the difference is the tide.
       </p>
+      <table className="corr-table">
+        <thead>
+          <tr>
+            <th scope="col" />
+            <th scope="col">Real tide</th>
+            <th scope="col">Calm tide</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Zone-days flooded</th>
+            <td>{counterfactual.floodedZoneDaysActual}</td>
+            <td>{counterfactual.floodedZoneDaysCounterfactual}</td>
+          </tr>
+          <tr>
+            <th scope="row">Mean depth</th>
+            <td>{counterfactual.meanDepthActualM.toFixed(3)} m</td>
+            <td>{counterfactual.meanDepthCounterfactualM.toFixed(3)} m</td>
+          </tr>
+          <tr>
+            <th scope="row">Peak depth</th>
+            <td>{counterfactual.peakDepthActualM.toFixed(2)} m</td>
+            <td>{counterfactual.peakDepthCounterfactualM.toFixed(2)} m</td>
+          </tr>
+          <tr>
+            <th scope="row">Outfall shut</th>
+            <td>{counterfactual.meanGateClosedHoursActual.toFixed(1)} h/day</td>
+            <td>{counterfactual.meanGateClosedHoursCounterfactual.toFixed(1)} h/day</td>
+          </tr>
+        </tbody>
+      </table>
+      <p className="muted">
+        {counterfactual.extraZoneDaysFromTide > 0
+          ? `${counterfactual.extraZoneDaysFromTide} extra zone-days of flooding in this month are attributable to the tide inside the model.`
+          : "On this series the tide adds no extra zone-days of flooding in the model - the rainfall alone is enough to exceed the threshold on those days."}
+        {counterfactual.peakDepthActualM === counterfactual.peakDepthCounterfactualM &&
+          " The peak depth is unchanged because the month's deepest zone is a riverine one, upstream of tidal gating: the tide moves the coastal zones, not that peak."}
+      </p>
+      <p className="caveat">{counterfactual.method}</p>
       <p className="caveat">{correlation.caveat}</p>
 
       <h3>Comparison against reported counts</h3>

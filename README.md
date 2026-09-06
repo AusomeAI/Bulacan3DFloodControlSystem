@@ -34,7 +34,7 @@ normally.
 ```bash
 npm run build    # typecheck + production build into dist/
 npm run preview  # serve the build
-npm test         # 30 unit tests: model, scene geometry, data integrity
+npm test         # 45 unit tests: model, counterfactual, day records, scene, data
 npm run lint     # typecheck only
 ```
 
@@ -97,7 +97,9 @@ which is why the referrer restriction in step 5 above matters.
 | **Project details panel** | Record fields, the real programme context with a dated source link, the modelled state of the containing zone, and GLB import. |
 | **Layer controls** | Waterways, pumping stations & flood gates, drainage channels, flood barriers, river works, NMIA-vicinity works, flood-zone envelopes, modelled water surface. |
 | **Water-flow animation** | Custom GLSL chevrons travelling downstream along each channel; a rippling translucent water surface whose height and colour follow modelled depth. |
-| **Timeline** | 5 Aug – 5 Sep 2026, play/pause and scrub, with a rainfall/tide/depth chart and the real reported events pinned to their dates. |
+| **Simulated month** | The past month, 5 Aug – 6 Sep 2026, simulated day by day: rainfall, Manila Bay tide, Angat level, and per-zone flood depth from the model. |
+| **Date navigation** | A calendar strip over the month — cell height is rainfall, the underline is modelled flood severity, a yellow dot marks a day carrying published reporting. Filter to rain days, flooding days or reported days; *Prev*/*Next* jump between matching days; arrow keys walk the strip; the timeline chart is itself a date picker. Selecting a day lists every flooded zone with its depth and how long its outfall was modelled shut, plus the day's quoted reports with sources. |
+| **Timeline** | Play/pause and scrub across the same month, with a rainfall/tide/depth chart. |
 | **Reduced motion** | `prefers-reduced-motion` disables flow animation, ripples and camera flights; the timeline still steps, instantly. |
 | **Fallback** | No API key, no Map ID, no WebGL, or a Maps load failure → the SVG schematic, plus setup instructions. |
 | **Responsive** | Two-column desktop layout collapses to a single column with a panel toggle below 900 px. |
@@ -115,7 +117,7 @@ CMS or an open-data mirror instead.
 | `projects.geojson` | 16 demonstration project points across five categories | demonstration |
 | `waterways.geojson` | 10 river / tidal-channel centrelines | schematic |
 | `flood-zones.geojson` | 8 zone envelopes with the model parameters | demonstration |
-| `flood-drivers-timeline.json` | daily rainfall, tide, Angat level + 8 cited observations | mixed |
+| `flood-drivers-timeline.json` | daily rainfall, tide, Angat level + 11 cited observations | mixed |
 | `camera-tour.json` | tour waypoints and the default camera | demonstration |
 | `sources.json` | the bibliography every `source` id resolves against | reported |
 
@@ -177,10 +179,20 @@ Per zone, per day:
 The app reports lagged Pearson correlations of rainfall and tide against
 modelled depth. The tide column comes out small or negative, and that is the
 honest and interesting result: tide is not a driver that puts water on the
-ground, it is a *gate*. So the panel also reports the conditional statistic —
-across the wettest days, mean modelled depth when the tide was above its median
-versus below, and how many hours a day the outfalls were modelled shut. Same
-rain, deeper water, because of the bay.
+ground, it is a *gate*.
+
+Since a correlation cannot measure a gate, the panel answers the question with a
+**counterfactual run** instead: the identical rainfall series is re-run with the
+bay pinned at the calmest tide of the month, and the two runs are differenced.
+Same rain, same catchments, same structures — only the tide changes. On the
+shipped series that is +5 zone-days of flooding, mean depth 0.214 m against
+0.201 m, and outfalls shut 3.7 h/day against 2.4 h/day. The month's *peak* depth
+is unchanged, because the deepest zone is riverine Calumpit, upstream of tidal
+gating — the tide moves the coastal zones, not that peak.
+
+(An earlier version of this panel split wet days by tide height instead. That
+statistic flipped sign when the series was extended by a single day, which is
+exactly what a confounded comparison does — the counterfactual replaced it.)
 
 **Limits, stated plainly.** The model is not calibrated, not validated and not a
 forecast. Its parameters are illustrative judgements, not surveyed elevations or
@@ -254,12 +266,12 @@ features as demonstration placeholders like every other feature.
 public/data/          replaceable JSON + GeoJSON, fetched at runtime
 public/models/        drop GLB files here
 scripts/              gen-timeline.mjs — regenerates the schematic driver series
-src/lib/              flood model, correlation, data loading, geometry, palette
+src/lib/              flood model, correlation, day records, data loading, geometry
 src/three/            FloodScene (ribbons, structures, water surface), GLB loader
 src/components/       MapView (Maps + WebGLOverlayView), SchematicMap fallback,
-                      layer / timeline / tour / details / info panels
+                      layer / date-navigator / timeline / tour / details panels
 src/hooks/            Maps loader, reduced motion, WebGL detection, media queries
-tests/                model + scene + data-integrity tests (vitest)
+tests/                model, counterfactual, day-record, scene and data tests
 ```
 
 `MapView` and three.js are lazy-loaded, so the credential-free fallback ships

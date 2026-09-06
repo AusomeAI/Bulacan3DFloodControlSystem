@@ -229,28 +229,7 @@ export interface CorrelationSummary {
    * interaction, which is what the next field is for.
    */
   combinedIndexVsDepth: number;
-  /**
-   * The honest way to show the tide's role. Tide does not put water on the
-   * ground by itself - it decides whether the day's rain can leave. So this
-   * splits the *wet* days (rainfall at or above the median wet-day total) by
-   * whether the tide was above or below its median, and reports the mean
-   * modelled depth of each group.
-   */
-  tideConditional: {
-    wetDayCount: number;
-    meanDepthHighTideM: number;
-    meanDepthLowTideM: number;
-    ratio: number;
-    meanGateClosedHoursHighTide: number;
-  };
   caveat: string;
-}
-
-function median(xs: number[]): number {
-  if (xs.length === 0) return 0;
-  const s = [...xs].sort((a, b) => a - b);
-  const mid = Math.floor(s.length / 2);
-  return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
 }
 
 const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
@@ -271,30 +250,9 @@ export function summariseCorrelations(days: DriverDay[], run: ModelRun): Correla
   const best = (xs: { lag: number; r: number }[]) =>
     xs.reduce((acc, cur) => (Math.abs(cur.r) > Math.abs(acc.r) ? cur : acc)).lag;
 
-  const wetThreshold = median(rain.filter((r) => r > 0));
-  const wetIdx = days.map((_, i) => i).filter((i) => rain[i] >= wetThreshold);
-  const tideThreshold = median(tide);
-  const highIdx = wetIdx.filter((i) => tide[i] >= tideThreshold);
-  const lowIdx = wetIdx.filter((i) => tide[i] < tideThreshold);
-  // Depth responds with a lag, so look at the day itself and the day after.
-  const responseAt = (i: number) => Math.max(depth[i] ?? 0, depth[i + 1] ?? 0);
-  const meanDepthHighTideM = mean(highIdx.map(responseAt));
-  const meanDepthLowTideM = mean(lowIdx.map(responseAt));
-  const gateHours = Object.values(run.zones).reduce<number[]>((acc, states) => {
-    highIdx.forEach((i) => acc.push(states[i]?.gateClosedHours ?? 0));
-    return acc;
-  }, []);
-
   return {
     rainfallVsDepth,
     tideVsDepth,
-    tideConditional: {
-      wetDayCount: wetIdx.length,
-      meanDepthHighTideM,
-      meanDepthLowTideM,
-      ratio: meanDepthLowTideM > 0 ? meanDepthHighTideM / meanDepthLowTideM : 0,
-      meanGateClosedHoursHighTide: mean(gateHours),
-    },
     bestRainfallLag: best(rainfallVsDepth),
     bestTideLag: best(tideVsDepth),
     combinedIndexVsDepth: pearson(combined, depth),
@@ -330,4 +288,65 @@ export function qualitativeCheck(
         source: o.source,
       };
     });
+}
+
+/**
+ * How much of the modelled flooding is the tide's doing?
+ *
+ * A correlation cannot answer that: the tide is not a driver that puts water on
+ * the ground, and its spring-neap cycle drifts in and out of phase with the
+ * rain, so a lagged coefficient on it is mostly noise. The clean way to isolate
+ * it inside a model is a counterfactual: run the identical rainfall series
+ * again with the bay held at the calmest tide of the month, and difference the
+ * two runs. Same rain, same catchments, same structures - only the tide changes.
+ *
+ * This is a statement about the model's own mechanism, not about Bulacan.
+ */
+export interface TideCounterfactual {
+  /** Tide level the counterfactual run was pinned at, metres. */
+  baselineTideM: number;
+  /** Zone-days above the notable depth, with the real tide series and without. */
+  floodedZoneDaysActual: number;
+  floodedZoneDaysCounterfactual: number;
+  /** Extra zone-days of flooding attributable to the tide in the model. */
+  extraZoneDaysFromTide: number;
+  meanDepthActualM: number;
+  meanDepthCounterfactualM: number;
+  peakDepthActualM: number;
+  peakDepthCounterfactualM: number;
+  meanGateClosedHoursActual: number;
+  meanGateClosedHoursCounterfactual: number;
+  method: string;
+}
+
+export function compareTideCounterfactual(
+  zones: FloodZoneFeature[],
+  days: DriverDay[],
+): TideCounterfactual {
+  const baselineTideM = Math.min(...days.map((d) => d.tide_max_m));
+  const calmDays = days.map((d) => ({ ...d, tide_max_m: baselineTideM }));
+
+  const actual = runFloodModel(zones, days);
+  const counterfactual = runFloodModel(zones, calmDays);
+
+  const flatten = (r: ModelRun) => Object.values(r.zones).flat();
+  const a = flatten(actual);
+  const c = flatten(counterfactual);
+
+  return {
+    baselineTideM,
+    floodedZoneDaysActual: a.filter((s) => s.depthM >= NOTABLE_DEPTH_M).length,
+    floodedZoneDaysCounterfactual: c.filter((s) => s.depthM >= NOTABLE_DEPTH_M).length,
+    extraZoneDaysFromTide:
+      a.filter((s) => s.depthM >= NOTABLE_DEPTH_M).length -
+      c.filter((s) => s.depthM >= NOTABLE_DEPTH_M).length,
+    meanDepthActualM: mean(actual.provincialMeanDepthM),
+    meanDepthCounterfactualM: mean(counterfactual.provincialMeanDepthM),
+    peakDepthActualM: Math.max(...a.map((s) => s.depthM)),
+    peakDepthCounterfactualM: Math.max(...c.map((s) => s.depthM)),
+    meanGateClosedHoursActual: mean(a.map((s) => s.gateClosedHours)),
+    meanGateClosedHoursCounterfactual: mean(c.map((s) => s.gateClosedHours)),
+    method:
+      "Identical rainfall and catchment parameters, re-run with Manila Bay pinned at the month's calmest modelled tide. The difference is the tide's contribution inside this model - not a measured or observed quantity.",
+  };
 }
