@@ -1,0 +1,457 @@
+{
+  "type": "FeatureCollection",
+  "name": "bulacan-flood-zones-demonstration",
+  "metadata": {
+    "dataClass": "demonstration",
+    "notice": "DEMONSTRATION GEOMETRY AND PARAMETERS. These polygons are coarse hand-drawn envelopes around real municipalities, not hydrological catchment boundaries or hazard maps. The parameters (ground level, drain invert, storage, pump capacity, barrier crest) are illustrative values chosen so the demonstration model behaves plausibly - they are NOT surveyed elevations or design capacities. Replace with DPWH/JICA catchment data and NAMRIA elevation before drawing any conclusion. For real hazard maps use the DOST Project NOAH / HazardHunterPH flood hazard layers. 'pondingConcentration' expresses that floodwater does not spread evenly: it collects in the low-lying fraction of each zone, so the depth people experience there is several times the mean water column. These multipliers are illustrative judgements, not measurements.",
+    "compiledOn": "2026-09-06",
+    "crs": "EPSG:4326"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": "zone-hagonoy-paombong",
+      "properties": {
+        "name": "Hagonoy - Paombong coastal flats",
+        "municipalities": [
+          "Hagonoy",
+          "Paombong"
+        ],
+        "regime": "tidal-dominated",
+        "dataClass": "demonstration",
+        "model": {
+          "groundLevelM": 0.55,
+          "drainInvertM": 0.15,
+          "storageMm": 18,
+          "runoffCoefficient": 0.72,
+          "conveyanceMmPerDay": 42,
+          "pumpCapacityMmPerDay": 6,
+          "barrierCrestM": 1.6,
+          "upstreamShare": 0.12,
+          "recessionPerDay": 0.34,
+          "pondingConcentration": 9.0
+        },
+        "context": "Reported as among the most persistently flooded towns in August 2026; DPWH described dikes here as improperly designed inland dikes facing the open sea.",
+        "source": "tribune-2026-08-23",
+        "sourceDate": "2026-08-23"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              120.69,
+              14.77
+            ],
+            [
+              120.79,
+              14.782
+            ],
+            [
+              120.8,
+              14.862
+            ],
+            [
+              120.706,
+              14.87
+            ],
+            [
+              120.69,
+              14.77
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "zone-calumpit-pulilan",
+      "properties": {
+        "name": "Calumpit - Pulilan riverine basin",
+        "municipalities": [
+          "Calumpit",
+          "Pulilan",
+          "Apalit fringe"
+        ],
+        "regime": "riverine + backwater",
+        "dataClass": "demonstration",
+        "model": {
+          "groundLevelM": 2.1,
+          "drainInvertM": 1.1,
+          "storageMm": 26,
+          "runoffCoefficient": 0.62,
+          "conveyanceMmPerDay": 55,
+          "pumpCapacityMmPerDay": 4,
+          "barrierCrestM": 3.5,
+          "upstreamShare": 0.85,
+          "recessionPerDay": 0.28,
+          "pondingConcentration": 8.0
+        },
+        "context": "Sits at the Angat-Pampanga confluence; deepest August 2026 water (up to five feet) was monitored in Barangays Meysulao and Gugo, Calumpit.",
+        "source": "philstar-2026-08-30",
+        "sourceDate": "2026-08-30"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              120.735,
+              14.88
+            ],
+            [
+              120.86,
+              14.878
+            ],
+            [
+              120.868,
+              14.945
+            ],
+            [
+              120.74,
+              14.952
+            ],
+            [
+              120.735,
+              14.88
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "zone-malolos",
+      "properties": {
+        "name": "Malolos City lowland",
+        "municipalities": [
+          "Malolos City"
+        ],
+        "regime": "mixed pluvial + tidal",
+        "dataClass": "demonstration",
+        "model": {
+          "groundLevelM": 1.3,
+          "drainInvertM": 0.6,
+          "storageMm": 22,
+          "runoffCoefficient": 0.75,
+          "conveyanceMmPerDay": 48,
+          "pumpCapacityMmPerDay": 8,
+          "barrierCrestM": 2.4,
+          "upstreamShare": 0.35,
+          "recessionPerDay": 0.32,
+          "pondingConcentration": 7.5
+        },
+        "context": "Recorded the highest number of flooded barangays in the province (32) on 12 August 2026.",
+        "source": "philstar-2026-08-12",
+        "sourceDate": "2026-08-12"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              120.762,
+              14.8
+            ],
+            [
+              120.862,
+              14.812
+            ],
+            [
+              120.868,
+              14.878
+            ],
+            [
+              120.775,
+              14.872
+            ],
+            [
+              120.762,
+              14.8
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "zone-guiguinto-balagtas",
+      "properties": {
+        "name": "Guiguinto - Balagtas - Bocaue corridor",
+        "municipalities": [
+          "Guiguinto",
+          "Balagtas",
+          "Bocaue",
+          "Pandi"
+        ],
+        "regime": "urban pluvial + high-tide affected",
+        "dataClass": "demonstration",
+        "model": {
+          "groundLevelM": 3.2,
+          "drainInvertM": 0.85,
+          "storageMm": 16,
+          "runoffCoefficient": 0.82,
+          "conveyanceMmPerDay": 40,
+          "pumpCapacityMmPerDay": 5,
+          "barrierCrestM": 4.0,
+          "upstreamShare": 0.22,
+          "recessionPerDay": 0.42,
+          "pondingConcentration": 6.0
+        },
+        "context": "DPWH groups Guiguinto, Balagtas, Bocaue and Pandi with the high-tide-affected towns in its pending flood control workload.",
+        "source": "inquirer-stalled-2026",
+        "sourceDate": "2026-08-19"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              120.862,
+              14.79
+            ],
+            [
+              120.945,
+              14.795
+            ],
+            [
+              120.95,
+              14.872
+            ],
+            [
+              120.868,
+              14.868
+            ],
+            [
+              120.862,
+              14.79
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "zone-bulakan-taliptip",
+      "properties": {
+        "name": "Bulakan - Taliptip coastal (NMIA vicinity)",
+        "municipalities": [
+          "Bulakan",
+          "Obando fringe"
+        ],
+        "regime": "tidal-dominated",
+        "dataClass": "demonstration",
+        "model": {
+          "groundLevelM": 0.7,
+          "drainInvertM": 0.2,
+          "storageMm": 14,
+          "runoffCoefficient": 0.68,
+          "conveyanceMmPerDay": 38,
+          "pumpCapacityMmPerDay": 5,
+          "barrierCrestM": 1.8,
+          "upstreamShare": 0.18,
+          "recessionPerDay": 0.3,
+          "pondingConcentration": 9.0
+        },
+        "context": "Adjacent to the New Manila International Airport site. Causation for the August 2026 flooding here is publicly disputed; SMC/SMAI rejects claims linking the project to it and cites integrated flood measures. This prototype presents both the claim and the response with sources and asserts neither.",
+        "source": "bworld-nmia-2026-09-04",
+        "sourceDate": "2026-09-04"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              120.772,
+              14.742
+            ],
+            [
+              120.88,
+              14.752
+            ],
+            [
+              120.885,
+              14.808
+            ],
+            [
+              120.78,
+              14.8
+            ],
+            [
+              120.772,
+              14.742
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "zone-santa-maria-marilao",
+      "properties": {
+        "name": "Santa Maria - Marilao - Meycauayan lowland",
+        "municipalities": [
+          "Santa Maria",
+          "Marilao",
+          "Meycauayan City",
+          "Obando"
+        ],
+        "regime": "urban pluvial + tidal outlet",
+        "dataClass": "demonstration",
+        "model": {
+          "groundLevelM": 2.6,
+          "drainInvertM": 0.75,
+          "storageMm": 12,
+          "runoffCoefficient": 0.86,
+          "conveyanceMmPerDay": 36,
+          "pumpCapacityMmPerDay": 7,
+          "barrierCrestM": 3.2,
+          "upstreamShare": 0.2,
+          "recessionPerDay": 0.45,
+          "pondingConcentration": 5.5
+        },
+        "context": "Interconnected channel chain discharging at Obando; a densely built corridor where drainage capacity rather than river stage tends to govern.",
+        "source": "bworld-2026-08-18",
+        "sourceDate": "2026-08-18"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              120.905,
+              14.7
+            ],
+            [
+              120.995,
+              14.712
+            ],
+            [
+              121.0,
+              14.84
+            ],
+            [
+              120.93,
+              14.835
+            ],
+            [
+              120.905,
+              14.7
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "zone-angat-norzagaray",
+      "properties": {
+        "name": "Angat - Norzagaray upland catchment",
+        "municipalities": [
+          "Angat",
+          "Norzagaray",
+          "San Rafael"
+        ],
+        "regime": "upland runoff source",
+        "dataClass": "demonstration",
+        "model": {
+          "groundLevelM": 18.0,
+          "drainInvertM": 16.0,
+          "storageMm": 34,
+          "runoffCoefficient": 0.55,
+          "conveyanceMmPerDay": 90,
+          "pumpCapacityMmPerDay": 0,
+          "barrierCrestM": 22.0,
+          "upstreamShare": 0.0,
+          "recessionPerDay": 0.6,
+          "pondingConcentration": 3.0
+        },
+        "context": "Angat town reported nine flooded barangays in the 12 August 2026 count; the upland catchment is the runoff source routed downstream in the model.",
+        "source": "philstar-2026-08-12",
+        "sourceDate": "2026-08-12"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.0,
+              14.885
+            ],
+            [
+              121.12,
+              14.888
+            ],
+            [
+              121.125,
+              14.96
+            ],
+            [
+              121.005,
+              14.955
+            ],
+            [
+              121.0,
+              14.885
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "zone-san-miguel",
+      "properties": {
+        "name": "San Miguel - northern Bulacan",
+        "municipalities": [
+          "San Miguel",
+          "San Ildefonso"
+        ],
+        "regime": "riverine",
+        "dataClass": "demonstration",
+        "model": {
+          "groundLevelM": 6.5,
+          "drainInvertM": 5.0,
+          "storageMm": 28,
+          "runoffCoefficient": 0.6,
+          "conveyanceMmPerDay": 60,
+          "pumpCapacityMmPerDay": 0,
+          "barrierCrestM": 8.5,
+          "upstreamShare": 0.55,
+          "recessionPerDay": 0.4,
+          "pondingConcentration": 6.5
+        },
+        "context": "San Miguel reported 16 flooded barangays on 12 August 2026, with water in Barangay San Vicente reported between one and six feet.",
+        "source": "philstar-2026-08-12",
+        "sourceDate": "2026-08-12"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              120.93,
+              15.1
+            ],
+            [
+              121.03,
+              15.105
+            ],
+            [
+              121.035,
+              15.185
+            ],
+            [
+              120.935,
+              15.18
+            ],
+            [
+              120.93,
+              15.1
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

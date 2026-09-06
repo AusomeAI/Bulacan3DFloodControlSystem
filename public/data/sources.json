@@ -1,0 +1,214 @@
+{
+  "$schema": "./schemas/sources.schema.json",
+  "description": "Bibliography for every real-world figure used in this application. Each dataset record references one of these source ids. Nothing in the app should assert a real-world number that is not traceable to an entry here.",
+  "compiledOn": "2026-09-06",
+  "sources": [
+    {
+      "id": "philstar-2026-08-12",
+      "publisher": "The Philippine Star",
+      "title": "High tide, rain inundate 149 Bulacan villages",
+      "date": "2026-08-12",
+      "url": "https://www.philstar.com/nation/2026/08/12/2548689/high-tide-rain-inundate-149-bulacan-villages",
+      "type": "news"
+    },
+    {
+      "id": "philstar-2026-08-17",
+      "publisher": "The Philippine Star",
+      "title": "116 Bulacan barangays remain flooded",
+      "date": "2026-08-17",
+      "url": "https://www.philstar.com/nation/2026/08/17/2549733/116-bulacan-barangays-remain-flooded",
+      "type": "news"
+    },
+    {
+      "id": "philstar-2026-08-30",
+      "publisher": "The Philippine Star",
+      "title": "Backflood, high tide inundate 71 Bulacan villages",
+      "date": "2026-08-30",
+      "url": "https://www.philstar.com/headlines/2026/08/30/2552752/backflood-high-tide-inundate-71-bulacan-villages",
+      "type": "news"
+    },
+    {
+      "id": "inquirer-2026-08-10",
+      "publisher": "Philippine Daily Inquirer",
+      "title": "Bulacan floods rise to 6 feet, displace about 11,000",
+      "date": "2026-08-10",
+      "url": "https://newsinfo.inquirer.net/2281615/bulacan-floods-rise-to-6-feet-displace-about-11000",
+      "type": "news"
+    },
+    {
+      "id": "mb-2026-08-10",
+      "publisher": "Manila Bulletin",
+      "title": "Angat Dam water level up 8 meters amid 'habagat' rains",
+      "date": "2026-08-10",
+      "url": "https://mb.com.ph/2026/08/10/angat-dam-water-level-up-8-meters-amid-habagat-rains",
+      "type": "news"
+    },
+    {
+      "id": "manilatimes-2026-08-21",
+      "publisher": "The Manila Times",
+      "title": "Bulacan declares state of calamity",
+      "date": "2026-08-21",
+      "url": "https://www.manilatimes.net/2026/08/21/regions/bulacan-declares-state-of-calamity/2409302",
+      "type": "news"
+    },
+    {
+      "id": "pna-calamity-2026",
+      "publisher": "Philippine News Agency",
+      "title": "Bulacan declares state of calamity due to widespread flooding",
+      "date": "2026-08-21",
+      "url": "https://www.pna.gov.ph/articles/1282342",
+      "type": "government"
+    },
+    {
+      "id": "gma-2026-08-28",
+      "publisher": "GMA News Online",
+      "title": "LIVE UPDATES: Habagat rains affect parts of PH on Friday, Aug. 28, 2026 (PAGASA rainfall outlook)",
+      "date": "2026-08-28",
+      "url": "https://www.gmanetwork.com/news/weather/content/1000158/live-updates-habagat-rains-affect-parts-of-ph-on-friday-aug-28-2026/story/",
+      "type": "news"
+    },
+    {
+      "id": "gma-2026-08-09",
+      "publisher": "GMA News Online",
+      "title": "Habagat, high tide cause water levels to rise in Bulacan coastal areas",
+      "date": "2026-08-09",
+      "url": "https://www.gmanetwork.com/news/topstories/regions/997873/habagat-high-tide-cause-water-levels-to-rise-in-bulacan-coastal-areas/story/",
+      "type": "news"
+    },
+    {
+      "id": "inquirer-stalled-2026",
+      "publisher": "Philippine Daily Inquirer",
+      "title": "Bulacan's 200 flood control projects stalled",
+      "date": "2026-08-19",
+      "url": "https://newsinfo.inquirer.net/2280789/bulacans-200-flood-control-projects-stalled",
+      "type": "news"
+    },
+    {
+      "id": "rappler-funds",
+      "publisher": "Rappler (Newsbreak)",
+      "title": "Which Bulacan towns got biggest slices of DPWH flood control funds?",
+      "date": "2025-09-01",
+      "url": "https://www.rappler.com/newsbreak/iq/bulacan-city-municipality-most-flood-control-projects/",
+      "type": "news",
+      "note": "Analysis of DPWH flood control project data."
+    },
+    {
+      "id": "philstar-coa-2025-11-29",
+      "publisher": "The Philippine Star",
+      "title": "P279-million Bulacan flood control projects flagged as 'ghost' or relocated - COA",
+      "date": "2025-11-29",
+      "url": "https://www.philstar.com/headlines/2025/11/29/2490731/p279-million-bulacan-flood-control-projects-flagged-ghost-or-relocated-coa",
+      "type": "audit"
+    },
+    {
+      "id": "pna-ghost-projects",
+      "publisher": "Philippine News Agency",
+      "title": "'Ghost projects' in Bulacan tied to DPWH contractors",
+      "date": "2025-09-05",
+      "url": "https://www.pna.gov.ph/articles/1256889",
+      "type": "government"
+    },
+    {
+      "id": "bworld-2026-08-18",
+      "publisher": "BusinessWorld",
+      "title": "Marcos eyes flood control upgrades as monsoon rains expose drainage gaps",
+      "date": "2026-08-18",
+      "url": "https://bworldonline.com/the-nation/2026/08/18/770971/marcos-eyes-flood-control-upgrades-as-monsoon-rains-expose-drainage-gaps/",
+      "type": "news",
+      "note": "Reports DPWH plan for 19 pumping stations and flood gates across Malolos, Hagonoy, Calumpit, Paombong, Bulakan and Guiguinto."
+    },
+    {
+      "id": "manilatimes-dizon-2026-08-24",
+      "publisher": "The Manila Times",
+      "title": "Dizon vows long-term fix into Bulacan flood crisis",
+      "date": "2026-08-24",
+      "url": "https://www.manilatimes.net/2026/08/24/news/dizon-vows-long-term-fix-into-into-bulacan-flood-crisis/2410970",
+      "type": "news"
+    },
+    {
+      "id": "tribune-2026-08-23",
+      "publisher": "Daily Tribune",
+      "title": "DPWH checks ghost flood control projects in Paombong and Hagonoy",
+      "date": "2026-08-23",
+      "url": "https://tribune.net.ph/2026/08/23/dpwh-checks-ghost-flood-control-projects-in-paombong-and-hagonoy",
+      "type": "news"
+    },
+    {
+      "id": "bulacan-gov-eo",
+      "publisher": "Provincial Government of Bulacan",
+      "title": "Bulacan gov issues Executive Order, mandates comprehensive review of Bulacan Flood Control Projects",
+      "date": "2025-09-10",
+      "url": "https://bulacan.gov.ph/bulacan-gov-issues-executive-order-mandates-comprehensive-review-of-bulacan-flood-control-projects/",
+      "type": "government"
+    },
+    {
+      "id": "bulacan-gov-rivers",
+      "publisher": "Provincial Government of Bulacan",
+      "title": "Governor Fernando leads inter-agency program to control flooding and restore rivers in Bulacan",
+      "date": "2025-08-15",
+      "url": "https://bulacan.gov.ph/governor-fernando-leads-inter-agency-program-to-control-flooding-and-restore-rivers-in-bulacan/",
+      "type": "government",
+      "note": "Names Angat, Pamarawan, Malolos, Hagonoy and Guiguinto rivers as heavily silted and needing dredging."
+    },
+    {
+      "id": "philstar-dpwh-green-2025-12-25",
+      "publisher": "The Philippine Star",
+      "title": "DPWH eyes 'green' flood control projects in Bulacan",
+      "date": "2025-12-25",
+      "url": "https://www.philstar.com/headlines/2025/12/25/2496693/dpwh-eyes-green-flood-control-projects-bulacan",
+      "type": "news",
+      "note": "Describes proposed sabo dams, catchment/detention basins, revetments and dredging on the Pampanga and Angat rivers."
+    },
+    {
+      "id": "inquirer-smc-2026-09",
+      "publisher": "Philippine Daily Inquirer (Business)",
+      "title": "SMC rejects claims linking Bulacan airport to floods",
+      "date": "2026-09-03",
+      "url": "https://business.inquirer.net/609171/smc-rejects-claims-linking-bulacan-airport-to-floods",
+      "type": "news"
+    },
+    {
+      "id": "bworld-nmia-2026-09-04",
+      "publisher": "BusinessWorld",
+      "title": "Facing scrutiny, SMC cites flood measures for Bulacan airport",
+      "date": "2026-09-04",
+      "url": "https://bworldonline.com/corporate/2026/09/04/774513/facing-scrutiny-smc-cites-flood-measures-for-bulacan-airport/",
+      "type": "news"
+    },
+    {
+      "id": "manilatimes-nmia-2026-09-05",
+      "publisher": "The Manila Times",
+      "title": "Long-term flood measures integrated in Bulacan airport development",
+      "date": "2026-09-05",
+      "url": "https://www.manilatimes.net/2026/09/05/regions/long-term-flood-measures-integrated-in-bulacan-airport-development/2418745",
+      "type": "news"
+    },
+    {
+      "id": "dpwh-transparency",
+      "publisher": "DPWH / BetterGov transparency mirror",
+      "title": "DPWH flood control project records (public transparency dataset)",
+      "date": "2026-09-06",
+      "url": "https://transparency.bettergov.ph/dpwh/projects",
+      "type": "dataset",
+      "note": "Per-contract records (project ID, description, location, contractor, cost, status). Use this to replace demonstration project entries with real contract records."
+    },
+    {
+      "id": "pagasa",
+      "publisher": "PAGASA (DOST)",
+      "title": "Philippine Atmospheric, Geophysical and Astronomical Services Administration - rainfall, dam and tide bulletins",
+      "date": "2026-09-06",
+      "url": "https://www.pagasa.dost.gov.ph/",
+      "type": "government",
+      "note": "Primary source for rainfall advisories, Angat/Ipo dam levels and Manila Bay tide predictions."
+    },
+    {
+      "id": "namria-tides",
+      "publisher": "NAMRIA / tide prediction services",
+      "title": "Manila Bay tide predictions",
+      "date": "2026-08-01",
+      "url": "https://www.tidetime.org/asia/philippines/manila-calendar-aug.htm",
+      "type": "dataset",
+      "note": "Tide values used in this prototype's timeline are schematic semi-diurnal reconstructions, NOT official predicted heights. Replace with NAMRIA/PAGASA tide tables for any real analysis."
+    }
+  ]
+}

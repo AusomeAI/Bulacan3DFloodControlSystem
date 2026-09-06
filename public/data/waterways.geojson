@@ -1,0 +1,266 @@
+{
+  "type": "FeatureCollection",
+  "name": "bulacan-waterways",
+  "metadata": {
+    "dataClass": "schematic",
+    "notice": "SCHEMATIC GEOMETRY - these centerlines are hand-digitized approximations drawn between real, named settlements and river mouths so the demonstration reads correctly at province scale. They are NOT survey-grade hydrography. Replace with NAMRIA / DENR-RBCO / DPWH river centerlines before any analytical use.",
+    "riverNamesSource": "bulacan-gov-rivers",
+    "compiledOn": "2026-09-06",
+    "crs": "EPSG:4326"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": "ww-angat",
+      "properties": {
+        "name": "Angat River",
+        "system": "Angat-Pampanga",
+        "class": "major-river",
+        "flowDirection": "east-to-west",
+        "widthMeters": 120,
+        "note": "Drains Angat Dam and the Sierra Madre foothills west across Bustos, Plaridel and Pulilan, joining the Pampanga River at Calumpit. Named by the provincial government among the heavily silted rivers targeted for dredging.",
+        "source": "bulacan-gov-rivers",
+        "sourceDate": "2025-08-15",
+        "dataClass": "schematic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [121.1533, 14.9161],
+          [121.1010, 14.9205],
+          [121.0483, 14.9114],
+          [121.0303, 14.9264],
+          [120.9950, 14.9420],
+          [120.9450, 14.9550],
+          [120.8975, 14.9542],
+          [120.8483, 14.9014],
+          [120.8050, 14.9020],
+          [120.7667, 14.9167]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ww-pampanga-lower",
+      "properties": {
+        "name": "Lower Pampanga River (Calumpit reach)",
+        "system": "Angat-Pampanga",
+        "class": "major-river",
+        "flowDirection": "north-to-south",
+        "widthMeters": 200,
+        "note": "Carries runoff from Pampanga and Nueva Ecija through Calumpit toward Manila Bay. Reporting during the August 2026 event attributed part of Bulacan's flooding to floodwater arriving from Pampanga and Nueva Ecija before draining to the bay.",
+        "source": "philstar-2026-08-12",
+        "sourceDate": "2026-08-12",
+        "dataClass": "schematic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [120.7900, 15.0100],
+          [120.7750, 14.9600],
+          [120.7667, 14.9167],
+          [120.7600, 14.8800],
+          [120.7480, 14.8500],
+          [120.7369, 14.8324],
+          [120.7180, 14.8000],
+          [120.7000, 14.7800]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ww-malolos",
+      "properties": {
+        "name": "Malolos River",
+        "system": "Malolos-Pamarawan",
+        "class": "river",
+        "flowDirection": "northeast-to-southwest",
+        "widthMeters": 60,
+        "note": "Runs through Malolos City to the Pamarawan delta on Manila Bay. Listed by the provincial government among rivers needing massive dredging to reopen a navigational channel in the offshore delta.",
+        "source": "bulacan-gov-rivers",
+        "sourceDate": "2025-08-15",
+        "dataClass": "schematic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [120.8600, 14.8700],
+          [120.8380, 14.8560],
+          [120.8114, 14.8433],
+          [120.7950, 14.8250],
+          [120.7800, 14.8050],
+          [120.7620, 14.7880]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ww-guiguinto",
+      "properties": {
+        "name": "Guiguinto River",
+        "system": "Malolos-Pamarawan",
+        "class": "river",
+        "flowDirection": "east-to-west",
+        "widthMeters": 45,
+        "note": "Drains Guiguinto and Balagtas westward into the Malolos river system. Guiguinto is among the towns the DPWH classes as high-tide affected.",
+        "source": "inquirer-stalled-2026",
+        "sourceDate": "2026-08-19",
+        "dataClass": "schematic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [120.9086, 14.8153],
+          [120.8797, 14.8347],
+          [120.8600, 14.8420],
+          [120.8380, 14.8560]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ww-bulacan",
+      "properties": {
+        "name": "Bulacan (Bulakan) River",
+        "system": "Bulakan-Taliptip",
+        "class": "river",
+        "flowDirection": "east-to-west",
+        "widthMeters": 70,
+        "note": "Flows through Bulakan town to the Taliptip coastal flats on Manila Bay, immediately adjacent to the New Manila International Airport reclamation site.",
+        "source": "bworld-nmia-2026-09-04",
+        "sourceDate": "2026-09-04",
+        "dataClass": "schematic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [120.9200, 14.8000],
+          [120.8790, 14.7925],
+          [120.8500, 14.7850],
+          [120.8200, 14.7760],
+          [120.7980, 14.7690]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ww-santa-maria",
+      "properties": {
+        "name": "Santa Maria River",
+        "system": "Meycauayan-Marilao-Obando",
+        "class": "river",
+        "flowDirection": "northeast-to-southwest",
+        "widthMeters": 50,
+        "note": "Drains Santa Maria and Pandi southwest into the Bocaue-Marilao-Meycauayan chain that discharges to Manila Bay at Obando.",
+        "source": "bulacan-gov-rivers",
+        "sourceDate": "2025-08-15",
+        "dataClass": "schematic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [120.9900, 14.8500],
+          [120.9611, 14.8203],
+          [120.9420, 14.8000],
+          [120.9333, 14.7800]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ww-bocaue-meycauayan",
+      "properties": {
+        "name": "Bocaue - Marilao - Meycauayan River chain",
+        "system": "Meycauayan-Marilao-Obando",
+        "class": "river",
+        "flowDirection": "north-to-south",
+        "widthMeters": 55,
+        "note": "Interconnected lowland channel discharging at Obando. Bocaue, Balagtas and Marilao sit in the belt DPWH describes as high-tide affected.",
+        "source": "inquirer-stalled-2026",
+        "sourceDate": "2026-08-19",
+        "dataClass": "schematic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [120.9333, 14.7800],
+          [120.9483, 14.7583],
+          [120.9608, 14.7369],
+          [120.9450, 14.7200],
+          [120.9370, 14.7080]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ww-hagonoy",
+      "properties": {
+        "name": "Hagonoy River",
+        "system": "Hagonoy-Pamarawan delta",
+        "class": "river",
+        "flowDirection": "northeast-to-southwest",
+        "widthMeters": 80,
+        "note": "Tidal river through Hagonoy, a fishing town where reporting repeatedly records tidal backflooding independent of rainfall.",
+        "source": "bulacan-gov-rivers",
+        "sourceDate": "2025-08-15",
+        "dataClass": "schematic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [120.7600, 14.8600],
+          [120.7369, 14.8324],
+          [120.7220, 14.8100],
+          [120.7050, 14.7900]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ww-pamarawan",
+      "properties": {
+        "name": "Pamarawan River / delta channel",
+        "system": "Malolos-Pamarawan",
+        "class": "tidal-channel",
+        "flowDirection": "tidal",
+        "widthMeters": 90,
+        "note": "Delta channel at the Malolos coast. Provincial statements describe the offshore delta as silted to the point of needing dredging to reopen a navigational channel.",
+        "source": "bulacan-gov-rivers",
+        "sourceDate": "2025-08-15",
+        "dataClass": "schematic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [120.7620, 14.7880],
+          [120.7500, 14.7750],
+          [120.7400, 14.7600]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ww-taliptip",
+      "properties": {
+        "name": "Taliptip tidal creeks (NMIA vicinity)",
+        "system": "Bulakan-Taliptip",
+        "class": "tidal-channel",
+        "flowDirection": "tidal",
+        "widthMeters": 40,
+        "note": "Mangrove and fishpond creek network on the Bulakan coast beside the New Manila International Airport site. SMC/SMAI states river channel improvements and drainage works extend beyond the airport footprint; the company rejects claims that the project caused the August 2026 flooding.",
+        "source": "inquirer-smc-2026-09",
+        "sourceDate": "2026-09-03",
+        "dataClass": "schematic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [120.8200, 14.7760],
+          [120.8080, 14.7700],
+          [120.7960, 14.7620],
+          [120.7860, 14.7520]
+        ]
+      }
+    }
+  ]
+}

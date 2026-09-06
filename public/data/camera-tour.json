@@ -1,0 +1,78 @@
+{
+  "name": "bulacan-demonstration-tour",
+  "metadata": {
+    "dataClass": "demonstration",
+    "notice": "Camera waypoints for the guided tour. Purely presentational - edit freely.",
+    "compiledOn": "2026-09-06"
+  },
+  "defaultCamera": {
+    "center": { "lat": 14.845, "lng": 120.86 },
+    "zoom": 11.2,
+    "tilt": 55,
+    "heading": 20
+  },
+  "waypoints": [
+    {
+      "id": "tour-overview",
+      "title": "Bulacan lowlands overview",
+      "caption": "The province drains from the Sierra Madre in the east to Manila Bay in the west. Everything in this tour sits in that gradient.",
+      "camera": { "lat": 14.845, "lng": 120.86, "zoom": 10.6, "tilt": 50, "heading": 20 },
+      "holdMs": 5000,
+      "focusLayers": ["waterways"]
+    },
+    {
+      "id": "tour-angat",
+      "title": "Angat River and the upper catchment",
+      "caption": "Angat Dam and the Norzagaray uplands. Reported reservoir elevation rose 8.66 m in 24 hours on 10 August 2026 (real, cited).",
+      "camera": { "lat": 14.918, "lng": 121.09, "zoom": 12.2, "tilt": 62, "heading": 265 },
+      "holdMs": 6000,
+      "focusLayers": ["waterways", "river-works"],
+      "focusProject": "demo-rw-angat-sabo"
+    },
+    {
+      "id": "tour-calumpit",
+      "title": "Calumpit confluence",
+      "caption": "Where the Angat meets the lower Pampanga River. Floodwater arriving from Pampanga and Nueva Ecija passes through here on its way to the bay.",
+      "camera": { "lat": 14.9167, "lng": 120.7667, "zoom": 13.4, "tilt": 65, "heading": 200 },
+      "holdMs": 6000,
+      "focusLayers": ["waterways", "flood-barrier", "pumping-station"],
+      "focusProject": "demo-ps-calumpit-frances"
+    },
+    {
+      "id": "tour-malolos",
+      "title": "Malolos and Guiguinto",
+      "caption": "The capital's lowland and the Guiguinto corridor - the belt DPWH classes as high-tide affected.",
+      "camera": { "lat": 14.8433, "lng": 120.8114, "zoom": 13.2, "tilt": 63, "heading": 160 },
+      "holdMs": 6000,
+      "focusLayers": ["waterways", "drainage-channel", "pumping-station"],
+      "focusProject": "demo-ps-malolos"
+    },
+    {
+      "id": "tour-santa-maria",
+      "title": "Santa Maria river system",
+      "caption": "Draining southwest through Bocaue, Marilao and Meycauayan to the Obando outlet.",
+      "camera": { "lat": 14.8203, "lng": 120.9611, "zoom": 13.0, "tilt": 60, "heading": 225 },
+      "holdMs": 5500,
+      "focusLayers": ["waterways", "drainage-channel"],
+      "focusProject": "demo-dc-santa-maria"
+    },
+    {
+      "id": "tour-hagonoy",
+      "title": "Hagonoy and Paombong coast",
+      "caption": "Tide-dominated flats. Here the bay level, not the rainfall, often decides whether water can leave at all.",
+      "camera": { "lat": 14.812, "lng": 120.735, "zoom": 13.0, "tilt": 67, "heading": 300 },
+      "holdMs": 6000,
+      "focusLayers": ["waterways", "flood-barrier", "pumping-station"],
+      "focusProject": "demo-ps-hagonoy-sto-rosario"
+    },
+    {
+      "id": "tour-nmia",
+      "title": "Bulakan coast and the NMIA site",
+      "caption": "The Taliptip flats beside the New Manila International Airport. Causation for the 2026 flooding here is publicly disputed - see the details panel for both statements.",
+      "camera": { "lat": 14.772, "lng": 120.806, "zoom": 13.6, "tilt": 68, "heading": 20 },
+      "holdMs": 7000,
+      "focusLayers": ["waterways", "airport-vicinity"],
+      "focusProject": "demo-airport-perimeter"
+    }
+  ]
+}

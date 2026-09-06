@@ -1,0 +1,357 @@
+{
+  "type": "FeatureCollection",
+  "name": "bulacan-flood-control-projects-demonstration",
+  "metadata": {
+    "dataClass": "demonstration",
+    "notice": "DEMONSTRATION DATA. Every feature in this file is a placeholder placed at a plausible location to exercise the 3D viewer. Names beginning with 'DEMO' are not real contracts. No budgets, physical completion percentages or flood-reduction figures are asserted anywhere in this file. The 'context' field on each feature carries a real, sourced statement about the surrounding programme; it never describes the demonstration feature itself. Replace this file with DPWH contract records (see sources.json -> dpwh-transparency) to show real projects.",
+    "replaceWith": "DPWH per-contract records: project ID, description, location, contractor, cost, status, implementing district engineering office.",
+    "compiledOn": "2026-09-06",
+    "crs": "EPSG:4326"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": "demo-ps-hagonoy-sto-rosario",
+      "properties": {
+        "name": "DEMO: Hagonoy coastal pumping station",
+        "category": "pumping-station",
+        "structureType": "pump house with outfall gate",
+        "municipality": "Hagonoy",
+        "river": "Hagonoy River",
+        "status": "demonstration-placeholder",
+        "demonstration": true,
+        "dataClass": "demonstration",
+        "heightMeters": 12,
+        "footprintMeters": [60, 40],
+        "modelUrl": null,
+        "description": "Placeholder pump house used to demonstrate the 3D structure layer and the pumped-drainage behaviour in the flood model: when the tide closes the gravity outfall, pumped discharge is the only way water leaves the polder.",
+        "context": "DPWH has said it plans 19 pumping stations and flood gates across Malolos City and the towns of Hagonoy, Calumpit, Paombong, Bulakan and Guiguinto, with the first 10 each funded at P250-P300 million; the largest pumping station is described as being in Barangay Sto. Rosario, Hagonoy, collecting stormwater and releasing it when sea levels drop.",
+        "source": "bworld-2026-08-18",
+        "sourceDate": "2026-08-18"
+      },
+      "geometry": { "type": "Point", "coordinates": [120.7369, 14.8324] }
+    },
+    {
+      "type": "Feature",
+      "id": "demo-ps-calumpit-frances",
+      "properties": {
+        "name": "DEMO: Calumpit river-side pumping station",
+        "category": "pumping-station",
+        "structureType": "pump house",
+        "municipality": "Calumpit",
+        "river": "Lower Pampanga River",
+        "status": "demonstration-placeholder",
+        "demonstration": true,
+        "dataClass": "demonstration",
+        "heightMeters": 10,
+        "footprintMeters": [45, 35],
+        "modelUrl": null,
+        "description": "Placeholder pump station at the Pampanga-Angat confluence used to demonstrate marker clustering and the details panel.",
+        "context": "Reporting describes DPWH flood control works in Calumpit involving dikes and pumping stations, with works in Barangays Cagison, Frances and Bulusan begun at the end of May and targeted for completion the following first quarter.",
+        "source": "bworld-2026-08-18",
+        "sourceDate": "2026-08-18"
+      },
+      "geometry": { "type": "Point", "coordinates": [120.7667, 14.9167] }
+    },
+    {
+      "type": "Feature",
+      "id": "demo-ps-malolos",
+      "properties": {
+        "name": "DEMO: Malolos City pumping station",
+        "category": "pumping-station",
+        "structureType": "pump house with retention forebay",
+        "municipality": "Malolos City",
+        "river": "Malolos River",
+        "status": "demonstration-placeholder",
+        "demonstration": true,
+        "dataClass": "demonstration",
+        "heightMeters": 11,
+        "footprintMeters": [50, 40],
+        "modelUrl": null,
+        "description": "Placeholder station used to demonstrate the pumping-station layer in the provincial capital.",
+        "context": "Malolos City is one of the six local governments named in the DPWH plan for 19 pumping stations and flood gates. Analysis of DPWH flood control funding reported Malolos City as allotted P3.04 billion across 45 projects.",
+        "source": "rappler-funds",
+        "sourceDate": "2025-09-01"
+      },
+      "geometry": { "type": "Point", "coordinates": [120.8114, 14.8433] }
+    },
+    {
+      "type": "Feature",
+      "id": "demo-ps-guiguinto",
+      "properties": {
+        "name": "DEMO: Guiguinto drainage pump",
+        "category": "pumping-station",
+        "structureType": "compact pump house",
+        "municipality": "Guiguinto",
+        "river": "Guiguinto River",
+        "status": "demonstration-placeholder",
+        "demonstration": true,
+        "dataClass": "demonstration",
+        "heightMeters": 8,
+        "footprintMeters": [30, 25],
+        "modelUrl": null,
+        "description": "Placeholder pump serving the Guiguinto lowlands in the demonstration.",
+        "context": "Guiguinto appears among the DPWH's high-tide-affected towns and among the six local governments named for pumping stations and flood gates.",
+        "source": "inquirer-stalled-2026",
+        "sourceDate": "2026-08-19"
+      },
+      "geometry": { "type": "Point", "coordinates": [120.8797, 14.8347] }
+    },
+    {
+      "type": "Feature",
+      "id": "demo-fg-paombong",
+      "properties": {
+        "name": "DEMO: Paombong tidal flood gate",
+        "category": "pumping-station",
+        "structureType": "tidal flood gate",
+        "municipality": "Paombong",
+        "river": "Pamarawan delta channel",
+        "status": "demonstration-placeholder",
+        "demonstration": true,
+        "dataClass": "demonstration",
+        "heightMeters": 7,
+        "footprintMeters": [35, 20],
+        "modelUrl": null,
+        "description": "Placeholder tide gate. In the illustrative model, gates like this shut when bay level exceeds the channel invert, which is the mechanism behind the 'backflood' behaviour the timeline demonstrates.",
+        "context": "During August 2026 inspections DPWH identified seawalls and coastal dikes built in Paombong's Barangays Masukol and Sta. Cruz as improperly designed 'inland dikes' facing the open sea of Manila Bay.",
+        "source": "tribune-2026-08-23",
+        "sourceDate": "2026-08-23"
+      },
+      "geometry": { "type": "Point", "coordinates": [120.7891, 14.8339] }
+    },
+    {
+      "type": "Feature",
+      "id": "demo-dc-malolos-outfall",
+      "properties": {
+        "name": "DEMO: Malolos outfall drainage channel",
+        "category": "drainage-channel",
+        "structureType": "lined open channel",
+        "municipality": "Malolos City",
+        "river": "Malolos River",
+        "status": "demonstration-placeholder",
+        "demonstration": true,
+        "dataClass": "demonstration",
+        "lengthMeters": 2400,
+        "modelUrl": null,
+        "description": "Placeholder lined channel used to demonstrate the drainage-channel layer and the animated flow ribbons.",
+        "context": "The provincial government has named the Malolos River among heavily silted rivers requiring massive dredging to reopen a navigational channel in the offshore delta.",
+        "source": "bulacan-gov-rivers",
+        "sourceDate": "2025-08-15"
+      },
+      "geometry": { "type": "Point", "coordinates": [120.7950, 14.8250] }
+    },
+    {
+      "type": "Feature",
+      "id": "demo-dc-guiguinto-balagtas",
+      "properties": {
+        "name": "DEMO: Guiguinto-Balagtas drainage main",
+        "category": "drainage-channel",
+        "structureType": "box culvert main",
+        "municipality": "Balagtas",
+        "river": "Guiguinto River",
+        "status": "demonstration-placeholder",
+        "demonstration": true,
+        "dataClass": "demonstration",
+        "lengthMeters": 1800,
+        "modelUrl": null,
+        "description": "Placeholder drainage main linking the Balagtas built-up area to the Guiguinto River in the demonstration.",
+        "context": "National officials publicly linked the August 2026 monsoon flooding to drainage gaps and ordered flood control upgrades.",
+        "source": "bworld-2026-08-18",
+        "sourceDate": "2026-08-18"
+      },
+      "geometry": { "type": "Point", "coordinates": [120.9086, 14.8153] }
+    },
+    {
+      "type": "Feature",
+      "id": "demo-dc-santa-maria",
+      "properties": {
+        "name": "DEMO: Santa Maria urban drainage improvement",
+        "category": "drainage-channel",
+        "structureType": "channel widening",
+        "municipality": "Santa Maria",
+        "river": "Santa Maria River",
+        "status": "demonstration-placeholder",
+        "demonstration": true,
+        "dataClass": "demonstration",
+        "lengthMeters": 3100,
+        "modelUrl": null,
+        "description": "Placeholder channel-widening reach on the Santa Maria River for the demonstration tour.",
+        "context": "The Santa Maria River is part of the interconnected Bocaue-Marilao-Meycauayan lowland system draining to Manila Bay at Obando.",
+        "source": "bulacan-gov-rivers",
+        "sourceDate": "2025-08-15"
+      },
+      "geometry": { "type": "Point", "coordinates": [120.9611, 14.8203] }
+    },
+    {
+      "type": "Feature",
+      "id": "demo-fb-hagonoy-seawall",
+      "properties": {
+        "name": "DEMO: Hagonoy coastal barrier segment",
+        "category": "flood-barrier",
+        "structureType": "seawall / coastal dike",
+        "municipality": "Hagonoy",
+        "river": "Manila Bay frontage",
+        "status": "demonstration-placeholder",
+        "demonstration": true,
+        "dataClass": "demonstration",
+        "heightMeters": 4.5,
+        "lengthMeters": 1500,
+        "modelUrl": null,
+        "description": "Placeholder coastal barrier used to demonstrate the flood-barrier layer and the barrier-overtopping state in the timeline.",
+        "context": "Flood control works in Hagonoy and Paombong, including proposed seawalls, were reported to remain in the planning stage as of late August 2026.",
+        "source": "bworld-2026-08-18",
+        "sourceDate": "2026-08-18"
+      },
+      "geometry": { "type": "Point", "coordinates": [120.7050, 14.7900] }
+    },
+    {
+      "type": "Feature",
+      "id": "demo-fb-calumpit-dike",
+      "properties": {
+        "name": "DEMO: Calumpit river dike segment",
+        "category": "flood-barrier",
+        "structureType": "river dike / revetment",
+        "municipality": "Calumpit",
+        "river": "Lower Pampanga River",
+        "status": "demonstration-placeholder",
+        "demonstration": true,
+        "dataClass": "demonstration",
+        "heightMeters": 3.5,
+        "lengthMeters": 2000,
+        "modelUrl": null,
+        "description": "Placeholder dike segment along the Pampanga River reach through Calumpit.",
+        "context": "Calumpit was reported as having 37 DPWH flood control projects worth P2.18 billion in an analysis of flood control funding; Senate proceedings also flagged alleged ghost flood control projects in Calumpit and Hagonoy tied to a top contractor.",
+        "source": "rappler-funds",
+        "sourceDate": "2025-09-01"
+      },
+      "geometry": { "type": "Point", "coordinates": [120.7600, 14.8800] }
+    },
+    {
+      "type": "Feature",
+      "id": "demo-fb-paombong-dike",
+      "properties": {
+        "name": "DEMO: Paombong coastal dike segment",
+        "category": "flood-barrier",
+        "structureType": "coastal dike",
+        "municipality": "Paombong",
+        "river": "Manila Bay frontage",
+        "status": "demonstration-placeholder",
+        "demonstration": true,
+        "dataClass": "demonstration",
+        "heightMeters": 3.0,
+        "lengthMeters": 1200,
+        "modelUrl": null,
+        "description": "Placeholder coastal dike. Used in the demonstration to show how a barrier crest lower than the modelled bay level lets tidal water through.",
+        "context": "DPWH inspections in August 2026 described dikes in Paombong's Barangays Masukol and Sta. Cruz as improperly designed inland dikes facing the open sea.",
+        "source": "tribune-2026-08-23",
+        "sourceDate": "2026-08-23"
+      },
+      "geometry": { "type": "Point", "coordinates": [120.7700, 14.8200] }
+    },
+    {
+      "type": "Feature",
+      "id": "demo-rw-angat-dredging",
+      "properties": {
+        "name": "DEMO: Angat River dredging reach",
+        "category": "river-works",
+        "structureType": "dredging / desilting",
+        "municipality": "Bustos - Plaridel - Pulilan",
+        "river": "Angat River",
+        "status": "demonstration-placeholder",
+        "demonstration": true,
+        "dataClass": "demonstration",
+        "lengthMeters": 6000,
+        "modelUrl": null,
+        "description": "Placeholder dredging reach used to demonstrate the river-works layer and the conveyance parameter in the model.",
+        "context": "DPWH has floated 'green' flood control approaches for Bulacan including sabo dams, water catchment and detention basins, revetment structures and river dredging along the Pampanga and Angat rivers.",
+        "source": "philstar-dpwh-green-2025-12-25",
+        "sourceDate": "2025-12-25"
+      },
+      "geometry": { "type": "Point", "coordinates": [120.8483, 14.9014] }
+    },
+    {
+      "type": "Feature",
+      "id": "demo-rw-angat-sabo",
+      "properties": {
+        "name": "DEMO: Upper Angat sabo dam",
+        "category": "river-works",
+        "structureType": "sabo dam (sediment control)",
+        "municipality": "Norzagaray",
+        "river": "Angat River",
+        "status": "demonstration-placeholder",
+        "demonstration": true,
+        "dataClass": "demonstration",
+        "heightMeters": 9,
+        "modelUrl": null,
+        "description": "Placeholder sediment-control structure in the upper catchment for the demonstration tour.",
+        "context": "Sabo dams are among the structure types DPWH has proposed for Bulacan's 'green' flood control programme.",
+        "source": "philstar-dpwh-green-2025-12-25",
+        "sourceDate": "2025-12-25"
+      },
+      "geometry": { "type": "Point", "coordinates": [121.0483, 14.9114] }
+    },
+    {
+      "type": "Feature",
+      "id": "demo-rw-detention-plaridel",
+      "properties": {
+        "name": "DEMO: Plaridel detention basin",
+        "category": "river-works",
+        "structureType": "detention basin",
+        "municipality": "Plaridel",
+        "river": "Angat River",
+        "status": "demonstration-placeholder",
+        "demonstration": true,
+        "dataClass": "demonstration",
+        "areaHectares": 25,
+        "modelUrl": null,
+        "description": "Placeholder detention basin. In the illustrative model, storage like this is represented as a fixed volume that shaves the runoff peak.",
+        "context": "Water catchment and detention basins are among the structure types DPWH has proposed for Bulacan.",
+        "source": "philstar-dpwh-green-2025-12-25",
+        "sourceDate": "2025-12-25"
+      },
+      "geometry": { "type": "Point", "coordinates": [120.8567, 14.8875] }
+    },
+    {
+      "type": "Feature",
+      "id": "demo-airport-perimeter",
+      "properties": {
+        "name": "DEMO: NMIA-vicinity perimeter drainage",
+        "category": "airport-vicinity",
+        "structureType": "perimeter channel and outfall",
+        "municipality": "Bulakan",
+        "river": "Taliptip tidal creeks",
+        "status": "demonstration-placeholder",
+        "demonstration": true,
+        "dataClass": "demonstration",
+        "lengthMeters": 5000,
+        "modelUrl": null,
+        "description": "Placeholder perimeter drainage beside the New Manila International Airport site, used to demonstrate the airport-vicinity layer. This prototype takes no position on the causation dispute; it presents the parties' public statements with sources.",
+        "context": "San Miguel Aerocity Inc. states flood resilience is integrated into the NMIA master plan - elevated airfield and terminal, enhanced drainage and river channel improvements, and water management works extending beyond the airport footprint - and rejects claims that the project caused the August 2026 flooding, saying flooding is a long-standing provincial problem. Online claims linking the project to the flooding prompted this response.",
+        "source": "inquirer-smc-2026-09",
+        "sourceDate": "2026-09-03"
+      },
+      "geometry": { "type": "Point", "coordinates": [120.8080, 14.7700] }
+    },
+    {
+      "type": "Feature",
+      "id": "demo-airport-river-improvement",
+      "properties": {
+        "name": "DEMO: Bulakan river channel improvement reach",
+        "category": "airport-vicinity",
+        "structureType": "channel improvement",
+        "municipality": "Bulakan",
+        "river": "Bulacan River",
+        "status": "demonstration-placeholder",
+        "demonstration": true,
+        "dataClass": "demonstration",
+        "lengthMeters": 3500,
+        "modelUrl": null,
+        "description": "Placeholder channel improvement reach on the Bulacan River near Taliptip.",
+        "context": "SMC has cited river channel improvements and desilting as part of its flood measures, reporting that over 4.3 million metric tons of debris and silt had been cleared across Bulacan's major river systems as of 18 August 2026. This is a company figure, not an independently audited one.",
+        "source": "bworld-nmia-2026-09-04",
+        "sourceDate": "2026-09-04"
+      },
+      "geometry": { "type": "Point", "coordinates": [120.8500, 14.7850] }
+    }
+  ]
+}
