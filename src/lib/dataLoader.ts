@@ -1,5 +1,17 @@
 import type { AppData } from "../types";
 
+declare global {
+  interface Window {
+    /**
+     * Optional embedded payload. The single-file build (scripts/build-artifact.mjs)
+     * inlines every dataset here so the app runs from one HTML file with no
+     * server and no network access at all. When absent, data is fetched from
+     * DATA_BASE as normal.
+     */
+    __BULACAN_DATA__?: AppData;
+  }
+}
+
 /**
  * All datasets live under `public/data` and are fetched at runtime, so they can
  * be swapped without rebuilding the app. Point DATA_BASE at a different origin
@@ -14,6 +26,9 @@ async function getJson<T>(file: string): Promise<T> {
 }
 
 export async function loadAppData(): Promise<AppData> {
+  const embedded = typeof window !== "undefined" ? window.__BULACAN_DATA__ : undefined;
+  if (embedded) return embedded;
+
   const [sources, projects, waterways, zones, drivers, tour] = await Promise.all([
     getJson<AppData["sources"]>("sources.json"),
     getJson<AppData["projects"]>("projects.geojson"),

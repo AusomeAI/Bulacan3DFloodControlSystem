@@ -34,6 +34,7 @@ normally.
 ```bash
 npm run build    # typecheck + production build into dist/
 npm run preview  # serve the build
+npm run build:single  # one standalone HTML file with the data embedded
 npm test         # 45 unit tests: model, counterfactual, day records, scene, data
 npm run lint     # typecheck only
 ```
@@ -103,6 +104,17 @@ which is why the referrer restriction in step 5 above matters.
 | **Reduced motion** | `prefers-reduced-motion` disables flow animation, ripples and camera flights; the timeline still steps, instantly. |
 | **Fallback** | No API key, no Map ID, no WebGL, or a Maps load failure → the SVG schematic, plus setup instructions. |
 | **Responsive** | Two-column desktop layout collapses to a single column with a panel toggle below 900 px. |
+
+---
+
+### Sharing a runnable copy
+
+`npm run build:single` emits `dist-artifact/bulacan-flood-demo.html`: the whole
+app in one file with every dataset inlined on `window.__BULACAN_DATA__`, so it
+opens from a `file://` URL or any static host with no server and no network
+access. The Google Maps path stays inert there — no credentials — so it opens in
+the schematic view. Use it to hand someone a working copy; use a real key and
+`npm run dev` to exercise the 3D map.
 
 ---
 
