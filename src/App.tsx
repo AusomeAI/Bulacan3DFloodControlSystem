@@ -38,6 +38,7 @@ import {
   useWebGLSupport,
 } from "./hooks/useEnvironment";
 import { useGoogleMapsApi } from "./hooks/useGoogleMaps";
+import type { MapErrorKind } from "./components/MapView";
 import type { AppData, CameraPose, LayerId } from "./types";
 
 const PLAYBACK_MS = 900;
@@ -53,6 +54,7 @@ export default function App() {
   const [data, setData] = useState<AppData | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [mapError, setMapError] = useState<string | null>(null);
+  const [mapErrorKind, setMapErrorKind] = useState<MapErrorKind | null>(null);
 
   const [layers, setLayers] = useState<Record<LayerId, boolean>>(initialLayers);
   const [dayIndex, setDayIndex] = useState(0);
@@ -71,7 +73,10 @@ export default function App() {
   const webglOk = useWebGLSupport();
   const isNarrow = useMediaQuery("(max-width: 900px)");
   const wantMaps = hasMapsCredentials && webglOk;
-  const { state: mapsState, error: mapsLoadError } = useGoogleMapsApi(GOOGLE_MAPS_API_KEY, wantMaps);
+  const { state: mapsState, error: mapsLoadError, retry: retryMaps } = useGoogleMapsApi(
+    GOOGLE_MAPS_API_KEY,
+    wantMaps,
+  );
 
   const use3D = wantMaps && mapsState === "ready" && !mapError;
   // The local 3D canvas needs a GPU but no credentials; the schematic needs neither.
@@ -221,8 +226,15 @@ export default function App() {
     );
   }
 
-  const noticeReason =
-    !hasMapsCredentials ? "no-credentials" : !webglOk ? "no-webgl" : mapError || mapsState === "error" ? "maps-error" : null;
+  const noticeReason = !hasMapsCredentials
+    ? "no-credentials"
+    : !webglOk
+      ? "no-webgl"
+      : mapErrorKind === "raster-map-id"
+        ? "raster-map-id"
+        : mapError || mapsState === "error"
+          ? "maps-error"
+          : null;
 
   return (
     <div className="app">
@@ -247,7 +259,13 @@ export default function App() {
 
       <main className="layout">
         <div className="stage">
-          {noticeReason && <SetupNotice reason={noticeReason} detail={mapsLoadError ?? mapError} />}
+          {noticeReason && (
+            <SetupNotice
+              reason={noticeReason}
+              detail={mapError ?? mapsLoadError}
+              onRetry={noticeReason === "maps-error" ? retryMaps : undefined}
+            />
+          )}
           {!use3D && webglOk && (
             <div className="view-switch" role="group" aria-label="Map view">
               <button
@@ -281,7 +299,10 @@ export default function App() {
                 animated={!reducedMotion}
                 onSelectProject={setSelectedId}
                 onSceneReady={(s) => (sceneRef.current = s)}
-                onError={setMapError}
+                onError={(message, kind) => {
+                  setMapError(message);
+                  setMapErrorKind(kind ?? "init");
+                }}
               />
             </Suspense>
           ) : showScene3D ? (

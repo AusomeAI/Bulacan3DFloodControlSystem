@@ -5,17 +5,19 @@ import { DEPTH_EXAGGERATION } from "../lib/constants";
 export type ViewMode = "3d" | "fallback";
 
 interface SetupNoticeProps {
-  reason: "no-credentials" | "no-webgl" | "maps-error";
+  reason: "no-credentials" | "no-webgl" | "maps-error" | "raster-map-id";
   detail?: string | null;
+  onRetry?: () => void;
 }
 
-export function SetupNotice({ reason, detail }: SetupNoticeProps) {
+export function SetupNotice({ reason, detail, onRetry }: SetupNoticeProps) {
   return (
     <aside className="setup-notice" role="status">
       <h2>
         {reason === "no-credentials" && "Running without Google Maps credentials"}
         {reason === "no-webgl" && "3D rendering unavailable on this device"}
         {reason === "maps-error" && "Google Maps could not be loaded"}
+        {reason === "raster-map-id" && "That Map ID is not a vector map"}
       </h2>
       {reason === "no-credentials" && (
         <>
@@ -47,11 +49,38 @@ export function SetupNotice({ reason, detail }: SetupNoticeProps) {
           run. The schematic view below is drawn in plain SVG from the same data.
         </p>
       )}
+      {reason === "raster-map-id" && (
+        <>
+          <p>
+            {detail ?? "This Map ID renders raster tiles."} You are seeing the local 3D scene instead, which needs no
+            credentials.
+          </p>
+          <ol>
+            <li>
+              <strong>Google Maps Platform → Map management → Create map ID.</strong>
+            </li>
+            <li>
+              Map type <strong>JavaScript</strong>, rendering type <strong>Vector</strong>, with <em>Tilt</em> and{" "}
+              <em>Rotation</em> enabled.
+            </li>
+            <li>
+              Put it in <code>VITE_GOOGLE_MAPS_MAP_ID</code> and restart the dev server. Google&rsquo;s sample{" "}
+              <code>DEMO_MAP_ID</code> will not work here &mdash; it is raster.
+            </li>
+          </ol>
+        </>
+      )}
       {reason === "maps-error" && (
-        <p>
-          {detail ?? "The Maps JavaScript API failed to load."} The schematic view below keeps the app usable in the
-          meantime.
-        </p>
+        <>
+          <p>
+            {detail ?? "The Maps JavaScript API failed to load."} The view below keeps the app usable in the meantime.
+          </p>
+          {onRetry && (
+            <button type="button" className="btn small" onClick={onRetry}>
+              Try loading Google Maps again
+            </button>
+          )}
+        </>
       )}
     </aside>
   );

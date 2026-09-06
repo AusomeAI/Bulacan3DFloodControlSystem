@@ -69,6 +69,12 @@ load a flat map and silently render nothing in 3D.
 3. Turn **Tilt** and **Rotation** on.
 4. Copy the map ID string.
 
+Google's sample `DEMO_MAP_ID` will not do: it is raster, and the Maps API says
+so out loud — *"The map is not a vector map, which will prevent use of
+WebGLOverlayView"*. The app detects this itself once the map draws, and swaps to
+the local 3D scene with the fix spelled out on screen rather than showing you an
+empty basemap.
+
 ### 3. Wire them up
 
 ```bash

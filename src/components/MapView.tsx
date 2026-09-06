@@ -16,8 +16,10 @@ interface Props {
   animated: boolean;
   onSelectProject: (id: string | null) => void;
   onSceneReady: (scene: FloodScene) => void;
-  onError: (message: string) => void;
+  onError: (message: string, kind?: MapErrorKind) => void;
 }
+
+export type MapErrorKind = "raster-map-id" | "init";
 
 /** Google's vector maps go further, but past these the demonstration geometry
  * stops meaning anything: the structures are placeholders, not surveys. */
@@ -79,10 +81,35 @@ export function MapView({
         gestureHandling: "greedy",
       });
     } catch (e) {
-      onError((e as Error).message);
+      onError((e as Error).message, "init");
       return;
     }
     mapRef.current = map;
+
+    // A raster Map ID renders a perfectly good flat basemap and then silently
+    // drops every WebGLOverlayView object on it. Say so instead.
+    let renderingChecked = false;
+    const checkRenderingType = () => {
+      if (renderingChecked) return true;
+      const type = map.getRenderingType?.();
+      // Stays UNINITIALIZED until the map has actually drawn. If tiles never
+      // arrive it never resolves, and saying nothing is the right answer.
+      if (!type || type === google.maps.RenderingType.UNINITIALIZED) return false;
+      renderingChecked = true;
+      if (type !== google.maps.RenderingType.VECTOR) {
+        onError(
+          `This Map ID renders ${String(type).toLowerCase()} tiles. WebGLOverlayView - and so every structure, river and water surface in this app - needs a vector map.`,
+          "raster-map-id",
+        );
+      }
+      return true;
+    };
+    const renderingListener = map.addListener("idle", checkRenderingType);
+    // idle can be missed or never fire, so poll for a while as well.
+    const renderingPoll = window.setInterval(() => {
+      if (checkRenderingType()) window.clearInterval(renderingPoll);
+    }, 400);
+    window.setTimeout(() => window.clearInterval(renderingPoll), 15000);
 
     const anchor = { lat: defaultCamera.center.lat, lng: defaultCamera.center.lng, altitude: 0 };
     const overlay = new TickingOverlay({ map, anchor, upAxis: "Z", animationMode: "always" });
@@ -129,6 +156,8 @@ export function MapView({
     return () => {
       google.maps.event.removeListener(clickListener);
       google.maps.event.removeListener(zoomListener);
+      google.maps.event.removeListener(renderingListener);
+      window.clearInterval(renderingPoll);
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
       scene.dispose();
       overlay.setMap(null as unknown as google.maps.Map);
