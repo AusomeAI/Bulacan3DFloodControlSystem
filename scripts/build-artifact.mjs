@@ -45,6 +45,22 @@ const data = Object.fromEntries(
 const js = readFileSync(join(dist, "app.js"), "utf8");
 const css = readFileSync(join(dist, "app.css"), "utf8");
 
+// Vite compiles VITE_ variables into the bundle, so a local .env.local would
+// otherwise ride along into a page that gets shared. Refuse to build one.
+const CREDENTIAL_PATTERNS = [
+  [/AIza[0-9A-Za-z_-]{30,}/, "a Google API key"],
+  [/VITE_GOOGLE_MAPS_MAP_ID"?\s*[:=]\s*"[^"]+"/, "a Google Map ID"],
+];
+for (const [pattern, what] of CREDENTIAL_PATTERNS) {
+  if (pattern.test(js)) {
+    throw new Error(
+      `Refusing to build a shareable page containing ${what}. ` +
+        "Build this target with the VITE_GOOGLE_MAPS_* variables cleared " +
+        "(npm run build:single does this) and try again.",
+    );
+  }
+}
+
 // The artifact host supplies <!doctype>, <html>, <head> and <body>, so emit the
 // page contents only.
 const html = `<title>Bulacan Flood Control</title>

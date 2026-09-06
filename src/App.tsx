@@ -5,6 +5,12 @@ import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } fro
 const MapView = lazy(() =>
   import("./components/MapView").then((m) => ({ default: m.MapView })),
 );
+const Scene3D = lazy(() =>
+  import("./components/Scene3D").then((m) => ({ default: m.Scene3D })),
+);
+
+/** Which view fills the stage when there is no Google map to show. */
+type FallbackView = "scene3d" | "schematic";
 import { SchematicMap } from "./components/SchematicMap";
 import { LayerControls } from "./components/LayerControls";
 import { TimelinePanel } from "./components/TimelinePanel";
@@ -57,6 +63,7 @@ export default function App() {
   const [cameraTarget, setCameraTarget] = useState<CameraPose | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dayFilter, setDayFilter] = useState<DayFilter>("all");
+  const [fallbackView, setFallbackView] = useState<FallbackView>("scene3d");
 
   const sceneRef = useRef<FloodScene | null>(null);
 
@@ -67,6 +74,9 @@ export default function App() {
   const { state: mapsState, error: mapsLoadError } = useGoogleMapsApi(GOOGLE_MAPS_API_KEY, wantMaps);
 
   const use3D = wantMaps && mapsState === "ready" && !mapError;
+  // The local 3D canvas needs a GPU but no credentials; the schematic needs neither.
+  const view: FallbackView = webglOk ? fallbackView : "schematic";
+  const showScene3D = !use3D && view === "scene3d";
 
   useEffect(() => {
     loadAppData().then(setData).catch((e: Error) => setLoadError(e.message));
@@ -238,6 +248,27 @@ export default function App() {
       <main className="layout">
         <div className="stage">
           {noticeReason && <SetupNotice reason={noticeReason} detail={mapsLoadError ?? mapError} />}
+          {!use3D && webglOk && (
+            <div className="view-switch" role="group" aria-label="Map view">
+              <button
+                type="button"
+                className={`chip${view === "scene3d" ? " active" : ""}`}
+                aria-pressed={view === "scene3d"}
+                onClick={() => setFallbackView("scene3d")}
+              >
+                3D scene
+              </button>
+              <button
+                type="button"
+                className={`chip${view === "schematic" ? " active" : ""}`}
+                aria-pressed={view === "schematic"}
+                onClick={() => setFallbackView("schematic")}
+              >
+                Schematic
+              </button>
+            </div>
+          )}
+
           {use3D ? (
             <Suspense fallback={<div className="map-canvas map-loading">Loading the 3D map&hellip;</div>}>
               <MapView
@@ -251,6 +282,18 @@ export default function App() {
                 onSelectProject={setSelectedId}
                 onSceneReady={(s) => (sceneRef.current = s)}
                 onError={setMapError}
+              />
+            </Suspense>
+          ) : showScene3D ? (
+            <Suspense fallback={<div className="map-canvas map-loading">Loading the 3D scene&hellip;</div>}>
+              <Scene3D
+                data={data}
+                layers={layers}
+                depths={depths}
+                selectedProjectId={selectedId}
+                reducedMotion={reducedMotion}
+                onSelectProject={setSelectedId}
+                onSceneReady={(s) => (sceneRef.current = s)}
               />
             </Suspense>
           ) : (
@@ -315,7 +358,7 @@ export default function App() {
             zone={selectedZone}
             zoneState={selectedZoneState}
             source={sourceById[selectedFeature?.properties.source ?? ""]}
-            canImportModels={use3D}
+            canImportModels={use3D || showScene3D}
             onClose={() => setSelectedId(null)}
             onImportModel={handleImportModel}
           />

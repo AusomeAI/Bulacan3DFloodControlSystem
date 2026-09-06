@@ -8,12 +8,13 @@ import {
   Mesh,
   MeshLambertMaterial,
   Object3D,
+  Scene,
   Shape,
   ShapeGeometry,
   ShaderMaterial,
+  SphereGeometry,
   Vector3,
 } from "three";
-import type { ThreeJSOverlayView } from "@googlemaps/three";
 import { DEPTH_EXAGGERATION } from "../lib/constants";
 import type {
   FloodZoneFeature,
@@ -80,6 +81,36 @@ const waterFragmentShader = /* glsl */ `
   }
 `;
 
+/**
+ * Everything FloodScene needs from its host: somewhere to put objects, and a
+ * way to turn a coordinate into a position in the scene's metric frame.
+ *
+ * Google's ThreeJSOverlayView satisfies this, and so does the local projector
+ * used by the credential-free 3D view, so one scene builder serves both.
+ */
+export interface SceneProjector {
+  readonly scene: Scene;
+  latLngAltitudeToVector3(
+    position: { lat: number; lng: number; altitude?: number },
+    target?: Vector3,
+  ): Vector3;
+}
+
+export interface FloodSceneOptions {
+  /** Multiplies placeholder structure geometry. Raise it where the camera sits far back. */
+  structureScale?: number;
+  /** When set, each structure also gets a map-pin mast of this height, in metres. */
+  pinHeightMeters?: number;
+  /** Vertical exaggeration applied to modelled water depth. */
+  depthExaggeration?: number;
+  /**
+   * Widens the river ribbons. A 60 m river is well under a pixel across a
+   * 60 km view, so the standalone 3D scene draws them wider than life and says
+   * so, rather than drawing them faithfully and invisibly.
+   */
+  waterwayWidthScale?: number;
+}
+
 interface WaterwayEntry {
   mesh: Mesh;
   material: ShaderMaterial;
@@ -97,7 +128,13 @@ interface ZoneEntry {
  * `overlay.latLngAltitudeToVector3`.
  */
 export class FloodScene {
-  private overlay: ThreeJSOverlayView;
+  private overlay: SceneProjector;
+  private structureScale: number;
+  private pinHeightMeters: number;
+  private depthExaggeration: number;
+  private waterwayWidthScale: number;
+  private pinHeads = new Map<string, Mesh>();
+  private selectedId: string | null = null;
   private layers = new Map<LayerId, Group>();
   private waterways: WaterwayEntry[] = [];
   private zones = new Map<string, ZoneEntry>();
@@ -105,8 +142,12 @@ export class FloodScene {
   private clock = 0;
   private animate = true;
 
-  constructor(overlay: ThreeJSOverlayView) {
+  constructor(overlay: SceneProjector, options: FloodSceneOptions = {}) {
     this.overlay = overlay;
+    this.structureScale = options.structureScale ?? 1;
+    this.pinHeightMeters = options.pinHeightMeters ?? 0;
+    this.depthExaggeration = options.depthExaggeration ?? DEPTH_EXAGGERATION;
+    this.waterwayWidthScale = options.waterwayWidthScale ?? 1;
     const ids: LayerId[] = [
       "waterways",
       "pumping-station",
@@ -153,7 +194,10 @@ export class FloodScene {
     for (const feature of features) {
       const points = feature.geometry.coordinates.map(([lng, lat]) => this.project(lng, lat, 6));
       if (points.length < 2) continue;
-      const geometry = this.buildRibbon(points, Math.max(30, feature.properties.widthMeters));
+      const geometry = this.buildRibbon(
+        points,
+        Math.max(30, feature.properties.widthMeters) * this.waterwayWidthScale,
+      );
       const material = new ShaderMaterial({
         vertexShader: flowVertexShader,
         fragmentShader: flowFragmentShader,
@@ -230,29 +274,61 @@ export class FloodScene {
       placeholder.userData = { kind: "project", id: feature.id };
       holder.add(placeholder);
 
+      if (this.pinHeightMeters > 0) {
+        for (const part of this.buildPin(feature)) {
+          part.userData = { kind: "project", id: feature.id };
+          holder.add(part);
+        }
+      }
+
       group.add(holder);
       this.projectMeshes.push(holder);
     }
+  }
+
+  /**
+   * A mast and head above the structure. At province scale a pump house is a
+   * couple of pixels, so the pin - not the building - is what the eye and the
+   * raycaster actually find.
+   */
+  private buildPin(feature: ProjectFeature): Object3D[] {
+    const color = CATEGORY_COLORS[feature.properties.category] ?? 0x8899aa;
+    const h = this.pinHeightMeters;
+    const mast = new Mesh(
+      new CylinderGeometry(h * 0.012, h * 0.012, h, 6),
+      new MeshLambertMaterial({ color, transparent: true, opacity: 0.55 }),
+    );
+    mast.geometry.rotateX(Math.PI / 2);
+    mast.position.z = h / 2;
+
+    const head = new Mesh(
+      new SphereGeometry(h * 0.085, 16, 12),
+      new MeshLambertMaterial({ color, emissive: color, emissiveIntensity: 0.35 }),
+    );
+    head.position.z = h;
+    this.pinHeads.set(feature.id, head);
+    return [mast, head];
   }
 
   private buildPlaceholder(feature: ProjectFeature): Object3D {
     const p = feature.properties;
     const color = CATEGORY_COLORS[p.category] ?? 0x8899aa;
     const material = new MeshLambertMaterial({ color, transparent: true, opacity: 0.92 });
-    const height = (p.heightMeters ?? 8) * 6; // exaggerated for province-scale legibility
+    const scale = this.structureScale;
+    const height = (p.heightMeters ?? 8) * 6 * scale; // exaggerated for province-scale legibility
     let geometry: BufferGeometry;
     if (p.category === "pumping-station") {
       const [w, d] = p.footprintMeters ?? [40, 30];
-      geometry = new BoxGeometry(w * 3, d * 3, height);
+      geometry = new BoxGeometry(w * 3 * scale, d * 3 * scale, height);
     } else if (p.category === "flood-barrier") {
-      geometry = new BoxGeometry(Math.min(1200, (p.lengthMeters ?? 800)), 60, height);
+      geometry = new BoxGeometry(Math.min(1200, p.lengthMeters ?? 800) * scale, 60 * scale, height);
     } else if (p.category === "drainage-channel") {
-      geometry = new BoxGeometry(300, 90, Math.max(60, height * 0.4));
+      geometry = new BoxGeometry(300 * scale, 90 * scale, Math.max(60 * scale, height * 0.4));
     } else if (p.category === "river-works") {
-      geometry = new CylinderGeometry(140, 190, height, 14);
+      geometry = new CylinderGeometry(140 * scale, 190 * scale, height, 14);
       geometry.rotateX(Math.PI / 2);
     } else {
-      geometry = new BoxGeometry(320, 320, height);
+      geometry = new BoxGeometry(320 * scale, 320 * scale, height);
     }
     const mesh = new Mesh(geometry, material);
     mesh.position.z = height / 2;
@@ -337,7 +413,7 @@ export class FloodScene {
       const depth = depths[zoneId] ?? 0;
       const visible = depth > 0.01;
       entry.mesh.visible = visible;
-      entry.mesh.position.z = 3 + depth * DEPTH_EXAGGERATION;
+      entry.mesh.position.z = 3 + depth * this.depthExaggeration;
       entry.material.uniforms.uOpacity.value = Math.min(0.62, 0.14 + depth * 0.9);
       const warm = Math.min(1, depth / 1.2);
       entry.material.uniforms.uColor.value = colorVec(
@@ -345,6 +421,16 @@ export class FloodScene {
       );
       entry.material.uniforms.uRipple.value = this.animate ? 4 + depth * 10 : 0;
     }
+  }
+
+  /** Highlights the selected structure by swelling its pin head. */
+  setSelected(projectId: string | null) {
+    if (this.selectedId === projectId) return;
+    const previous = this.selectedId ? this.pinHeads.get(this.selectedId) : undefined;
+    previous?.scale.setScalar(1);
+    this.selectedId = projectId;
+    const head = projectId ? this.pinHeads.get(projectId) : undefined;
+    head?.scale.setScalar(1.9);
   }
 
   /** Objects eligible for click-picking. */
@@ -366,6 +452,7 @@ export class FloodScene {
     this.waterways = [];
     this.zones.clear();
     this.projectMeshes = [];
+    this.pinHeads.clear();
   }
 }
 

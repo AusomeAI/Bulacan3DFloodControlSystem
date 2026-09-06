@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "lint": "tsc --noEmit",
-    "build:single": "vite build --config vite.artifact.config.ts && node scripts/build-artifact.mjs"
+    "build:single": "VITE_GOOGLE_MAPS_API_KEY= VITE_GOOGLE_MAPS_MAP_ID= vite build --config vite.artifact.config.ts && node scripts/build-artifact.mjs"
   },
   "dependencies": {
     "@googlemaps/three": "^4.0.13",

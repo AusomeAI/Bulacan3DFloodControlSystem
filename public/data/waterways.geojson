@@ -3,7 +3,7 @@
   "name": "bulacan-waterways",
   "metadata": {
     "dataClass": "schematic",
-    "notice": "SCHEMATIC GEOMETRY - these centerlines are hand-digitized approximations drawn between real, named settlements and river mouths so the demonstration reads correctly at province scale. They are NOT survey-grade hydrography. Replace with NAMRIA / DENR-RBCO / DPWH river centerlines before any analytical use.",
+    "notice": "SCHEMATIC GEOMETRY - these centerlines are hand-digitized approximations drawn between real, named settlements and river mouths so the demonstration reads correctly at province scale. They are NOT survey-grade hydrography. Replace with NAMRIA / DENR-RBCO / DPWH river centerlines before any analytical use. Tributaries carry a 'connectsTo' field naming the trunk they join and a 'nameBasis' field: 'documented' where the name is established, 'descriptive' where this schematic is describing a channel rather than asserting its official name.",
     "riverNamesSource": "bulacan-gov-rivers",
     "compiledOn": "2026-09-06",
     "crs": "EPSG:4326"
@@ -26,16 +26,46 @@
       "geometry": {
         "type": "LineString",
         "coordinates": [
-          [121.1533, 14.9161],
-          [121.1010, 14.9205],
-          [121.0483, 14.9114],
-          [121.0303, 14.9264],
-          [120.9950, 14.9420],
-          [120.9450, 14.9550],
-          [120.8975, 14.9542],
-          [120.8483, 14.9014],
-          [120.8050, 14.9020],
-          [120.7667, 14.9167]
+          [
+            121.1533,
+            14.9161
+          ],
+          [
+            121.101,
+            14.9205
+          ],
+          [
+            121.0483,
+            14.9114
+          ],
+          [
+            121.0303,
+            14.9264
+          ],
+          [
+            120.995,
+            14.942
+          ],
+          [
+            120.945,
+            14.955
+          ],
+          [
+            120.8975,
+            14.9542
+          ],
+          [
+            120.8483,
+            14.9014
+          ],
+          [
+            120.805,
+            14.902
+          ],
+          [
+            120.7667,
+            14.9167
+          ]
         ]
       }
     },
@@ -56,14 +86,38 @@
       "geometry": {
         "type": "LineString",
         "coordinates": [
-          [120.7900, 15.0100],
-          [120.7750, 14.9600],
-          [120.7667, 14.9167],
-          [120.7600, 14.8800],
-          [120.7480, 14.8500],
-          [120.7369, 14.8324],
-          [120.7180, 14.8000],
-          [120.7000, 14.7800]
+          [
+            120.79,
+            15.01
+          ],
+          [
+            120.775,
+            14.96
+          ],
+          [
+            120.7667,
+            14.9167
+          ],
+          [
+            120.76,
+            14.88
+          ],
+          [
+            120.748,
+            14.85
+          ],
+          [
+            120.7369,
+            14.8324
+          ],
+          [
+            120.718,
+            14.8
+          ],
+          [
+            120.7,
+            14.78
+          ]
         ]
       }
     },
@@ -84,12 +138,30 @@
       "geometry": {
         "type": "LineString",
         "coordinates": [
-          [120.8600, 14.8700],
-          [120.8380, 14.8560],
-          [120.8114, 14.8433],
-          [120.7950, 14.8250],
-          [120.7800, 14.8050],
-          [120.7620, 14.7880]
+          [
+            120.86,
+            14.87
+          ],
+          [
+            120.838,
+            14.856
+          ],
+          [
+            120.8114,
+            14.8433
+          ],
+          [
+            120.795,
+            14.825
+          ],
+          [
+            120.78,
+            14.805
+          ],
+          [
+            120.762,
+            14.788
+          ]
         ]
       }
     },
@@ -110,10 +182,22 @@
       "geometry": {
         "type": "LineString",
         "coordinates": [
-          [120.9086, 14.8153],
-          [120.8797, 14.8347],
-          [120.8600, 14.8420],
-          [120.8380, 14.8560]
+          [
+            120.9086,
+            14.8153
+          ],
+          [
+            120.8797,
+            14.8347
+          ],
+          [
+            120.86,
+            14.842
+          ],
+          [
+            120.838,
+            14.856
+          ]
         ]
       }
     },
@@ -134,11 +218,26 @@
       "geometry": {
         "type": "LineString",
         "coordinates": [
-          [120.9200, 14.8000],
-          [120.8790, 14.7925],
-          [120.8500, 14.7850],
-          [120.8200, 14.7760],
-          [120.7980, 14.7690]
+          [
+            120.92,
+            14.8
+          ],
+          [
+            120.879,
+            14.7925
+          ],
+          [
+            120.85,
+            14.785
+          ],
+          [
+            120.82,
+            14.776
+          ],
+          [
+            120.798,
+            14.769
+          ]
         ]
       }
     },
@@ -159,10 +258,22 @@
       "geometry": {
         "type": "LineString",
         "coordinates": [
-          [120.9900, 14.8500],
-          [120.9611, 14.8203],
-          [120.9420, 14.8000],
-          [120.9333, 14.7800]
+          [
+            120.99,
+            14.85
+          ],
+          [
+            120.9611,
+            14.8203
+          ],
+          [
+            120.942,
+            14.8
+          ],
+          [
+            120.9333,
+            14.78
+          ]
         ]
       }
     },
@@ -183,11 +294,26 @@
       "geometry": {
         "type": "LineString",
         "coordinates": [
-          [120.9333, 14.7800],
-          [120.9483, 14.7583],
-          [120.9608, 14.7369],
-          [120.9450, 14.7200],
-          [120.9370, 14.7080]
+          [
+            120.9333,
+            14.78
+          ],
+          [
+            120.9483,
+            14.7583
+          ],
+          [
+            120.9608,
+            14.7369
+          ],
+          [
+            120.945,
+            14.72
+          ],
+          [
+            120.937,
+            14.708
+          ]
         ]
       }
     },
@@ -208,10 +334,22 @@
       "geometry": {
         "type": "LineString",
         "coordinates": [
-          [120.7600, 14.8600],
-          [120.7369, 14.8324],
-          [120.7220, 14.8100],
-          [120.7050, 14.7900]
+          [
+            120.76,
+            14.86
+          ],
+          [
+            120.7369,
+            14.8324
+          ],
+          [
+            120.722,
+            14.81
+          ],
+          [
+            120.705,
+            14.79
+          ]
         ]
       }
     },
@@ -232,9 +370,18 @@
       "geometry": {
         "type": "LineString",
         "coordinates": [
-          [120.7620, 14.7880],
-          [120.7500, 14.7750],
-          [120.7400, 14.7600]
+          [
+            120.762,
+            14.788
+          ],
+          [
+            120.75,
+            14.775
+          ],
+          [
+            120.74,
+            14.76
+          ]
         ]
       }
     },
@@ -255,10 +402,554 @@
       "geometry": {
         "type": "LineString",
         "coordinates": [
-          [120.8200, 14.7760],
-          [120.8080, 14.7700],
-          [120.7960, 14.7620],
-          [120.7860, 14.7520]
+          [
+            120.82,
+            14.776
+          ],
+          [
+            120.808,
+            14.77
+          ],
+          [
+            120.796,
+            14.762
+          ],
+          [
+            120.786,
+            14.752
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ww-angat-ipo",
+      "properties": {
+        "name": "Angat River - Ipo reach",
+        "system": "Angat-Pampanga",
+        "class": "tributary",
+        "flowDirection": "toward the trunk",
+        "widthMeters": 70,
+        "connectsTo": "ww-angat",
+        "nameBasis": "documented",
+        "note": "The reach below Ipo Dam, which regulates releases from the Angat system before the river runs west across the lowlands. Angat Dam passed its 160 m monitoring level during the August 2026 monsoon.",
+        "source": "mb-2026-08-10",
+        "sourceDate": "2026-08-10",
+        "dataClass": "schematic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            121.1414,
+            14.8578
+          ],
+          [
+            121.126,
+            14.876
+          ],
+          [
+            121.112,
+            14.901
+          ],
+          [
+            121.101,
+            14.9205
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ww-norzagaray-creek",
+      "properties": {
+        "name": "Norzagaray north creek",
+        "system": "Angat-Pampanga",
+        "class": "tributary",
+        "flowDirection": "toward the trunk",
+        "widthMeters": 22,
+        "connectsTo": "ww-angat",
+        "nameBasis": "descriptive - not an official name",
+        "note": "Sierra Madre foothill creek feeding the Angat from the north. Drawn descriptively; this schematic does not assert an official name.",
+        "source": "bulacan-gov-rivers",
+        "sourceDate": "2025-08-15",
+        "dataClass": "schematic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            121.081,
+            14.972
+          ],
+          [
+            121.066,
+            14.945
+          ],
+          [
+            121.054,
+            14.925
+          ],
+          [
+            121.0483,
+            14.9114
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ww-san-rafael-trib",
+      "properties": {
+        "name": "San Rafael tributary",
+        "system": "Angat-Pampanga",
+        "class": "tributary",
+        "flowDirection": "toward the trunk",
+        "widthMeters": 28,
+        "connectsTo": "ww-angat",
+        "nameBasis": "descriptive - not an official name",
+        "note": "Drains the San Rafael side of the catchment into the Angat above Bustos. Descriptive name.",
+        "source": "bulacan-gov-rivers",
+        "sourceDate": "2025-08-15",
+        "dataClass": "schematic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            121.015,
+            15.015
+          ],
+          [
+            120.99,
+            14.988
+          ],
+          [
+            120.965,
+            14.968
+          ],
+          [
+            120.945,
+            14.955
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ww-bustos-outlet",
+      "properties": {
+        "name": "Bustos Dam outlet reach",
+        "system": "Angat-Pampanga",
+        "class": "tributary",
+        "flowDirection": "toward the trunk",
+        "widthMeters": 90,
+        "connectsTo": "ww-angat",
+        "nameBasis": "documented",
+        "note": "Bustos Dam sits on the Angat downstream of Angat and Ipo, and its releases set the stage the lowland towns see.",
+        "source": "bulacan-gov-rivers",
+        "sourceDate": "2025-08-15",
+        "dataClass": "schematic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            120.945,
+            14.955
+          ],
+          [
+            120.928,
+            14.952
+          ],
+          [
+            120.912,
+            14.953
+          ],
+          [
+            120.8975,
+            14.9542
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ww-bagbag",
+      "properties": {
+        "name": "Bagbag River",
+        "system": "Angat-Pampanga",
+        "class": "tributary",
+        "flowDirection": "toward the trunk",
+        "widthMeters": 45,
+        "connectsTo": "ww-pampanga-lower",
+        "nameBasis": "documented",
+        "note": "Runs through Calumpit to the Pampanga confluence. Calumpit repeatedly recorded the province's deepest water during the August 2026 event.",
+        "source": "philstar-2026-08-30",
+        "sourceDate": "2026-08-30",
+        "dataClass": "schematic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            120.815,
+            14.943
+          ],
+          [
+            120.798,
+            14.933
+          ],
+          [
+            120.781,
+            14.923
+          ],
+          [
+            120.7667,
+            14.9167
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ww-pulilan-creek",
+      "properties": {
+        "name": "Pulilan side creek",
+        "system": "Angat-Pampanga",
+        "class": "tributary",
+        "flowDirection": "toward the trunk",
+        "widthMeters": 18,
+        "connectsTo": "ww-angat",
+        "nameBasis": "descriptive - not an official name",
+        "note": "Local channel draining the Pulilan built-up area into the Angat. Descriptive name.",
+        "source": "bulacan-gov-rivers",
+        "sourceDate": "2025-08-15",
+        "dataClass": "schematic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            120.876,
+            14.926
+          ],
+          [
+            120.865,
+            14.916
+          ],
+          [
+            120.856,
+            14.907
+          ],
+          [
+            120.8483,
+            14.9014
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ww-plaridel-trib",
+      "properties": {
+        "name": "Plaridel - Malolos tributary",
+        "system": "Malolos-Pamarawan",
+        "class": "tributary",
+        "flowDirection": "toward the trunk",
+        "widthMeters": 25,
+        "connectsTo": "ww-malolos",
+        "nameBasis": "descriptive - not an official name",
+        "note": "Links the Plaridel lowland to the Malolos river system. Descriptive name.",
+        "source": "bulacan-gov-rivers",
+        "sourceDate": "2025-08-15",
+        "dataClass": "schematic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            120.86,
+            14.89
+          ],
+          [
+            120.854,
+            14.879
+          ],
+          [
+            120.846,
+            14.867
+          ],
+          [
+            120.838,
+            14.856
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ww-malolos-creek",
+      "properties": {
+        "name": "Malolos City creek",
+        "system": "Malolos-Pamarawan",
+        "class": "tributary",
+        "flowDirection": "toward the trunk",
+        "widthMeters": 16,
+        "connectsTo": "ww-malolos",
+        "nameBasis": "descriptive - not an official name",
+        "note": "Urban creek inside Malolos City, which reported the most flooded barangays in the province on 12 August 2026. Descriptive name.",
+        "source": "philstar-2026-08-12",
+        "sourceDate": "2026-08-12",
+        "dataClass": "schematic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            120.833,
+            14.826
+          ],
+          [
+            120.825,
+            14.832
+          ],
+          [
+            120.818,
+            14.838
+          ],
+          [
+            120.8114,
+            14.8433
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ww-balagtas-creek",
+      "properties": {
+        "name": "Balagtas creek",
+        "system": "Malolos-Pamarawan",
+        "class": "tributary",
+        "flowDirection": "toward the trunk",
+        "widthMeters": 15,
+        "connectsTo": "ww-guiguinto",
+        "nameBasis": "descriptive - not an official name",
+        "note": "Feeds the Guiguinto River from the Balagtas side of the high-tide-affected belt. Descriptive name.",
+        "source": "inquirer-stalled-2026",
+        "sourceDate": "2026-08-19",
+        "dataClass": "schematic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            120.932,
+            14.798
+          ],
+          [
+            120.923,
+            14.806
+          ],
+          [
+            120.915,
+            14.811
+          ],
+          [
+            120.9086,
+            14.8153
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ww-pandi-creek",
+      "properties": {
+        "name": "Pandi creek",
+        "system": "Meycauayan-Marilao-Obando",
+        "class": "tributary",
+        "flowDirection": "toward the trunk",
+        "widthMeters": 17,
+        "connectsTo": "ww-santa-maria",
+        "nameBasis": "descriptive - not an official name",
+        "note": "Drains Pandi into the Santa Maria River. Pandi is grouped with the high-tide-affected towns in the DPWH workload. Descriptive name.",
+        "source": "inquirer-stalled-2026",
+        "sourceDate": "2026-08-19",
+        "dataClass": "schematic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            120.9575,
+            14.8672
+          ],
+          [
+            120.968,
+            14.862
+          ],
+          [
+            120.98,
+            14.856
+          ],
+          [
+            120.99,
+            14.85
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ww-marilao",
+      "properties": {
+        "name": "Marilao River",
+        "system": "Meycauayan-Marilao-Obando",
+        "class": "tributary",
+        "flowDirection": "toward the trunk",
+        "widthMeters": 40,
+        "connectsTo": "ww-bocaue-meycauayan",
+        "nameBasis": "documented",
+        "note": "One of the named rivers of the Meycauayan-Marilao-Obando system draining to Manila Bay.",
+        "source": "bulacan-gov-rivers",
+        "sourceDate": "2025-08-15",
+        "dataClass": "schematic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            120.995,
+            14.764
+          ],
+          [
+            120.978,
+            14.761
+          ],
+          [
+            120.962,
+            14.7595
+          ],
+          [
+            120.9483,
+            14.7583
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ww-meycauayan",
+      "properties": {
+        "name": "Meycauayan River",
+        "system": "Meycauayan-Marilao-Obando",
+        "class": "tributary",
+        "flowDirection": "toward the trunk",
+        "widthMeters": 45,
+        "connectsTo": "ww-bocaue-meycauayan",
+        "nameBasis": "documented",
+        "note": "The Meycauayan reach of the same interconnected system, discharging at Obando.",
+        "source": "bulacan-gov-rivers",
+        "sourceDate": "2025-08-15",
+        "dataClass": "schematic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            121.002,
+            14.728
+          ],
+          [
+            120.987,
+            14.732
+          ],
+          [
+            120.973,
+            14.735
+          ],
+          [
+            120.9608,
+            14.7369
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ww-bulakan-creek",
+      "properties": {
+        "name": "Bulakan inland creek",
+        "system": "Bulakan-Taliptip",
+        "class": "tributary",
+        "flowDirection": "toward the trunk",
+        "widthMeters": 20,
+        "connectsTo": "ww-bulacan",
+        "nameBasis": "descriptive - not an official name",
+        "note": "Inland creek feeding the Bulacan River above the Taliptip flats. Descriptive name.",
+        "source": "bworld-nmia-2026-09-04",
+        "sourceDate": "2026-09-04",
+        "dataClass": "schematic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            120.908,
+            14.766
+          ],
+          [
+            120.898,
+            14.776
+          ],
+          [
+            120.888,
+            14.785
+          ],
+          [
+            120.879,
+            14.7925
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ww-hagonoy-trib",
+      "properties": {
+        "name": "Hagonoy north tributary",
+        "system": "Hagonoy-Pamarawan delta",
+        "class": "tributary",
+        "flowDirection": "toward the trunk",
+        "widthMeters": 24,
+        "connectsTo": "ww-hagonoy",
+        "nameBasis": "descriptive - not an official name",
+        "note": "Joins the Hagonoy River from the north across the fishpond flats. Descriptive name.",
+        "source": "bulacan-gov-rivers",
+        "sourceDate": "2025-08-15",
+        "dataClass": "schematic"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            120.786,
+            14.876
+          ],
+          [
+            120.776,
+            14.87
+          ],
+          [
+            120.767,
+            14.865
+          ],
+          [
+            120.76,
+            14.86
+          ]
         ]
       }
     }

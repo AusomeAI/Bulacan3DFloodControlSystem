@@ -80,12 +80,16 @@ VITE_GOOGLE_MAPS_API_KEY=AIza...
 VITE_GOOGLE_MAPS_MAP_ID=abc123def456
 ```
 
-Restart the dev server. The setup banner disappears and the tilted 3D map,
-camera tour and GLB import become available.
+Restart the dev server. The setup banner disappears and the tilted 3D map and
+camera tour become available. Without them you still get the interactive 3D
+scene — only the Google basemap and the camera tour need credentials.
 
 `.env.local` is git-ignored. Note that a Vite `VITE_`-prefixed variable is
 compiled into the client bundle — that is unavoidable for a browser Maps key,
-which is why the referrer restriction in step 5 above matters.
+which is why the referrer restriction in step 5 above matters. For the same
+reason `npm run build:single` clears both variables before building, and
+`scripts/build-artifact.mjs` refuses to emit a shareable page that contains an
+API key or Map ID.
 
 ---
 
@@ -93,7 +97,9 @@ which is why the referrer restriction in step 5 above matters.
 
 | Feature | Notes |
 | --- | --- |
-| **Tilted 3D map** | Vector basemap at ~55–68° tilt with heading, driven by the camera tour or by dragging. |
+| **Tilted 3D map** (needs credentials) | Vector basemap at ~55–68° tilt with heading, driven by the camera tour or by dragging. |
+| **Interactive 3D scene** (no credentials) | The same three.js scene drawn into a plain WebGL canvas with an orbit camera: drag to orbit, right-drag to pan, scroll to zoom, click a structure to select it. No basemap and no network — the province is built entirely from the GeoJSON, so rivers, structures and the modelled water surface behave as they do on the Google map. Rivers are drawn ×12 wide and water ×160 vertical, both stated on screen, because a 60 m river and a 40 cm flood are invisible across a 60 km view. |
+| **View switch** | Without credentials, a toggle picks the 3D scene or the flat schematic. Selection, layers, timeline and details are shared, so switching keeps your place. |
 | **Animated camera tour** | Seven stops from the Angat headwaters down to the NMIA coast, with play/stop and per-stop jumps. Eased 2.2 s flights; instant jumps under reduced motion. |
 | **Zoom and pan** | Both views carry the same control cluster: zoom in, zoom out, a level readout and a reset. On the 3D map they drive the Maps camera (clamped to z8–z19). On the schematic they drive the SVG viewBox — plus wheel-zoom toward the pointer, drag to pan, and arrow keys / `+` / `-` / `0` when it has focus. Labels, markers and stroke widths are counter-scaled so they stay the same size on screen at every magnification. |
 | **Clickable projects** | three.js structures are raycast-picked on the 3D map; SVG markers are clickable and keyboard-focusable in the fallback. |
@@ -129,7 +135,7 @@ CMS or an open-data mirror instead.
 | File | Contents | Class |
 | --- | --- | --- |
 | `projects.geojson` | 16 demonstration project points across five categories | demonstration |
-| `waterways.geojson` | 10 river / tidal-channel centrelines | schematic |
+| `waterways.geojson` | 24 channels: 10 trunk rivers and tidal channels plus 14 tributaries | schematic |
 | `flood-zones.geojson` | 8 zone envelopes with the model parameters | demonstration |
 | `flood-drivers-timeline.json` | daily rainfall, tide, Angat level + 11 cited observations | mixed |
 | `camera-tour.json` | tour waypoints and the default camera | demonstration |
@@ -140,6 +146,15 @@ carries `dataClass`, `source` and `sourceDate`. `npm test` enforces this:
 projects must be flagged as demonstrations, every `source` must resolve, every
 `sourceDate` must be an ISO date, and no project property may look like a budget
 or completion field.
+
+### River names and tributaries
+
+Tributary features carry `connectsTo` (the trunk they join) and `nameBasis`:
+`documented` where the name is established — the Angat's Ipo and Bustos
+reaches, the Bagbag River at Calumpit, the Marilao and Meycauayan rivers — and
+`descriptive` where the file is describing a channel rather than asserting its
+official name. Nothing here should be read as an authoritative gazetteer;
+replace the file with NAMRIA or DENR-RBCO hydrography for that.
 
 ### Replacing the demonstration projects with real DPWH records
 
@@ -282,16 +297,24 @@ public/models/        drop GLB files here
 scripts/              gen-timeline.mjs — regenerates the schematic driver series
 src/lib/              flood model, correlation, day records, viewport pan/zoom,
                       data loading, geometry, palette
-src/three/            FloodScene (ribbons, structures, water surface), GLB loader
-src/components/       MapView (Maps + WebGLOverlayView), SchematicMap fallback,
-                      layer / date-navigator / timeline / tour / details panels
+src/three/            FloodScene (ribbons, structures, water surface, pins),
+                      LocalProjector for the credential-free scene, GLB loader
+src/components/       MapView (Maps + WebGLOverlayView), Scene3D (orbit camera
+                      on a plain canvas), SchematicMap, and the layer /
+                      date-navigator / timeline / tour / details panels
 src/hooks/            Maps loader, reduced motion, WebGL detection, media queries
 tests/                model, counterfactual, day-record, viewport, scene and
                       data-integrity tests
 ```
 
-`MapView` and three.js are lazy-loaded, so the credential-free fallback ships
-about 178 kB of JavaScript instead of 780 kB.
+`MapView`, `Scene3D` and three.js are lazy-loaded. A browser with no WebGL never
+downloads three at all; the 3D scene pulls it on demand.
+
+One scene builder serves both 3D views. `FloodScene` takes a `SceneProjector` —
+anything that offers a `Scene` and a lat/lng-to-metres projection — which
+Google's `ThreeJSOverlayView` satisfies structurally, and so does
+`LocalProjector`. That is why the rivers, structures and water surface are
+identical in both, and why the scene can be tested headlessly against a stub.
 
 ## Accessibility
 
