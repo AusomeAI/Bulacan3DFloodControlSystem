@@ -35,7 +35,8 @@ normally.
 npm run build    # typecheck + production build into dist/
 npm run preview  # serve the build
 npm run build:single  # one standalone HTML file with the data embedded
-npm test         # 45 unit tests: model, counterfactual, day records, scene, data
+npm test         # 59 unit tests: model, counterfactual, day records, scene,
+                 # viewport pan/zoom, and data integrity
 npm run lint     # typecheck only
 ```
 
@@ -94,6 +95,7 @@ which is why the referrer restriction in step 5 above matters.
 | --- | --- |
 | **Tilted 3D map** | Vector basemap at ~55–68° tilt with heading, driven by the camera tour or by dragging. |
 | **Animated camera tour** | Seven stops from the Angat headwaters down to the NMIA coast, with play/stop and per-stop jumps. Eased 2.2 s flights; instant jumps under reduced motion. |
+| **Zoom and pan** | Both views carry the same control cluster: zoom in, zoom out, a level readout and a reset. On the 3D map they drive the Maps camera (clamped to z8–z19). On the schematic they drive the SVG viewBox — plus wheel-zoom toward the pointer, drag to pan, and arrow keys / `+` / `-` / `0` when it has focus. Labels, markers and stroke widths are counter-scaled so they stay the same size on screen at every magnification. |
 | **Clickable projects** | three.js structures are raycast-picked on the 3D map; SVG markers are clickable and keyboard-focusable in the fallback. |
 | **Project details panel** | Record fields, the real programme context with a dated source link, the modelled state of the containing zone, and GLB import. |
 | **Layer controls** | Waterways, pumping stations & flood gates, drainage channels, flood barriers, river works, NMIA-vicinity works, flood-zone envelopes, modelled water surface. |
@@ -278,12 +280,14 @@ features as demonstration placeholders like every other feature.
 public/data/          replaceable JSON + GeoJSON, fetched at runtime
 public/models/        drop GLB files here
 scripts/              gen-timeline.mjs — regenerates the schematic driver series
-src/lib/              flood model, correlation, day records, data loading, geometry
+src/lib/              flood model, correlation, day records, viewport pan/zoom,
+                      data loading, geometry, palette
 src/three/            FloodScene (ribbons, structures, water surface), GLB loader
 src/components/       MapView (Maps + WebGLOverlayView), SchematicMap fallback,
                       layer / date-navigator / timeline / tour / details panels
 src/hooks/            Maps loader, reduced motion, WebGL detection, media queries
-tests/                model, counterfactual, day-record, scene and data tests
+tests/                model, counterfactual, day-record, viewport, scene and
+                      data-integrity tests
 ```
 
 `MapView` and three.js are lazy-loaded, so the credential-free fallback ships
@@ -292,8 +296,9 @@ about 178 kB of JavaScript instead of 780 kB.
 ## Accessibility
 
 Semantic landmarks and headings, labelled form controls, keyboard-operable
-markers and tour stops, visible focus rings, `aria-pressed` on the play and tour
-toggles, `<title>` tooltips on every SVG shape, and a full
+markers and tour stops, a keyboard-navigable schematic map (arrow keys pan,
+`+`/`-` zoom, `0` resets), visible focus rings, `aria-pressed` on the play and
+tour toggles, `<title>` tooltips on every SVG shape, and a full
 `prefers-reduced-motion` path covering CSS animation, the flow shaders, the
 water ripple and the camera flights.
 

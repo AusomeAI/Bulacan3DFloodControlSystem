@@ -1,8 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ThreeJSOverlayView } from "@googlemaps/three";
 import { Vector2 } from "three";
 import { FloodScene } from "../three/floodScene";
 import { loadGLB } from "../three/glbLoader";
+import { MapZoomControls } from "./MapZoomControls";
 import type { AppData, CameraPose, LayerId } from "../types";
 
 interface Props {
@@ -17,6 +18,11 @@ interface Props {
   onSceneReady: (scene: FloodScene) => void;
   onError: (message: string) => void;
 }
+
+/** Google's vector maps go further, but past these the demonstration geometry
+ * stops meaning anything: the structures are placeholders, not surveys. */
+const MIN_MAP_ZOOM = 8;
+const MAX_MAP_ZOOM = 19;
 
 /** Cubic ease-in-out for camera moves. */
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
@@ -50,6 +56,7 @@ export function MapView({
   const overlayRef = useRef<TickingOverlay | null>(null);
   const sceneRef = useRef<FloodScene | null>(null);
   const animationRef = useRef<number | null>(null);
+  const [zoom, setZoom] = useState(data.tour.defaultCamera.zoom);
 
   // ------------------------------------------------------------------ set-up
   useEffect(() => {
@@ -101,6 +108,11 @@ export function MapView({
         });
     }
 
+    const zoomListener = map.addListener("zoom_changed", () => {
+      const z = map.getZoom();
+      if (typeof z === "number") setZoom(z);
+    });
+
     const clickListener = map.addListener("click", (event: google.maps.MapMouseEvent & { domEvent?: MouseEvent }) => {
       const dom = event.domEvent as MouseEvent | undefined;
       const bounds = containerRef.current?.getBoundingClientRect();
@@ -116,6 +128,7 @@ export function MapView({
 
     return () => {
       google.maps.event.removeListener(clickListener);
+      google.maps.event.removeListener(zoomListener);
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
       scene.dispose();
       overlay.setMap(null as unknown as google.maps.Map);
@@ -208,5 +221,42 @@ export function MapView({
     mapRef.current.panTo({ lat, lng });
   }, [selectedProjectId, data.projects.features]);
 
-  return <div ref={containerRef} className="map-canvas" role="application" aria-label="Interactive 3D map of Bulacan flood control demonstration" />;
+  const stepZoom = (delta: number) => {
+    const map = mapRef.current;
+    if (!map) return;
+    const next = Math.min(MAX_MAP_ZOOM, Math.max(MIN_MAP_ZOOM, (map.getZoom() ?? zoom) + delta));
+    map.setZoom(next);
+  };
+
+  const resetView = () => {
+    const map = mapRef.current;
+    if (!map) return;
+    const { defaultCamera } = data.tour;
+    map.moveCamera({
+      center: defaultCamera.center,
+      zoom: defaultCamera.zoom,
+      tilt: defaultCamera.tilt,
+      heading: defaultCamera.heading,
+    });
+  };
+
+  return (
+    <div className="map-shell">
+      <div
+        ref={containerRef}
+        className="map-canvas"
+        role="application"
+        aria-label="Interactive 3D map of Bulacan flood control demonstration"
+      />
+      <MapZoomControls
+        zoomLabel={`z${zoom.toFixed(1)}`}
+        canZoomIn={zoom < MAX_MAP_ZOOM}
+        canZoomOut={zoom > MIN_MAP_ZOOM}
+        onZoomIn={() => stepZoom(1)}
+        onZoomOut={() => stepZoom(-1)}
+        onReset={resetView}
+        resetLabel="Back to the province view"
+      />
+    </div>
+  );
 }
