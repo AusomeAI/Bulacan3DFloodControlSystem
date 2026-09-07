@@ -149,7 +149,11 @@ export function MapView({
         -((dom.clientY - bounds.top) / bounds.height) * 2 + 1,
       );
       const hits = overlay.raycast(point, scene.pickables, { recursive: true });
-      const hit = hits.find((h) => h.object.userData?.kind === "project");
+      // Pins and structures are both ways of grabbing the same project.
+      const hit = hits.find((h) => {
+        const kind = h.object.userData?.kind;
+        return kind === "project" || kind === "pin" || kind === "pick";
+      });
       onSelectProject((hit?.object.userData?.id as string) ?? null);
     });
 

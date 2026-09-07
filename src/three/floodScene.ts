@@ -6,6 +6,7 @@ import {
   Float32BufferAttribute,
   Group,
   Mesh,
+  MeshBasicMaterial,
   MeshLambertMaterial,
   Object3D,
   Scene,
@@ -276,10 +277,14 @@ export class FloodScene {
 
       if (this.pinHeightMeters > 0) {
         for (const part of this.buildPin(feature)) {
-          part.userData = { kind: "project", id: feature.id };
+          part.userData = { kind: "pin", id: feature.id };
           holder.add(part);
         }
       }
+
+      const target = this.buildPickTarget();
+      target.userData = { kind: "pick", id: feature.id };
+      holder.add(target);
 
       group.add(holder);
       this.projectMeshes.push(holder);
@@ -310,6 +315,22 @@ export class FloodScene {
     return [mast, head];
   }
 
+  /**
+   * Invisible, generous click target.
+   *
+   * A pump house is a few metres across and a pin mast a few tens; seen from
+   * 50 km back that is a sliver of a pixel, so aiming at the geometry itself is
+   * hopeless. This sphere is never drawn but is raycast, giving the structure a
+   * target you can actually hit - the equivalent of a marker's hit area.
+   */
+  private buildPickTarget(): Mesh {
+    const radius = this.pinHeightMeters > 0 ? this.pinHeightMeters * 0.5 : 130 * this.structureScale;
+    const mesh = new Mesh(new SphereGeometry(radius, 8, 6), new MeshBasicMaterial());
+    mesh.visible = false;
+    mesh.position.z = this.pinHeightMeters > 0 ? this.pinHeightMeters * 0.92 : radius * 0.6;
+    return mesh;
+  }
+
   private buildPlaceholder(feature: ProjectFeature): Object3D {
     const p = feature.properties;
     const color = CATEGORY_COLORS[p.category] ?? 0x8899aa;
@@ -337,15 +358,24 @@ export class FloodScene {
 
   /**
    * Replaces a project's placeholder with an imported GLB scene.
+   *
    * `object` is expected to be metre-scaled with Y up (the glTF convention);
-   * it is rotated into the overlay's Z-up frame here.
+   * it is rotated into the overlay's Z-up frame here and scaled by the same
+   * factor as the placeholders, so a real-size model reads at the same size in
+   * whichever view it is dropped into. The pin above it is left in place: at
+   * province scale the pin is what you can actually see and click.
    */
   replaceProjectModel(projectId: string, object: Object3D, scale = 1) {
     const holder = this.projectMeshes.find((m) => m.userData.id === projectId);
     if (!holder) return false;
+    // Pins and the pick target belong to the placement, not to the placeholder.
+    const keep = holder.children.filter(
+      (child) => child.userData.kind === "pin" || child.userData.kind === "pick",
+    );
     holder.clear();
+    for (const part of keep) holder.add(part);
     object.rotation.x = Math.PI / 2;
-    object.scale.setScalar(scale);
+    object.scale.setScalar(scale * this.structureScale);
     object.traverse((child) => {
       child.userData = { kind: "project", id: projectId };
     });
@@ -431,6 +461,12 @@ export class FloodScene {
     this.selectedId = projectId;
     const head = projectId ? this.pinHeads.get(projectId) : undefined;
     head?.scale.setScalar(1.9);
+  }
+
+  /** World position of a project's placement, for camera framing. */
+  positionOf(projectId: string): Vector3 | null {
+    const holder = this.projectMeshes.find((m) => m.userData.id === projectId);
+    return holder ? holder.position.clone() : null;
   }
 
   /** Objects eligible for click-picking. */

@@ -19,6 +19,7 @@ import {
 } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { FloodScene } from "../three/floodScene";
+import { loadGLB } from "../three/glbLoader";
 import { LocalProjector, boundsOf } from "../three/localProjector";
 import { MapZoomControls } from "./MapZoomControls";
 import type { AppData, LayerId } from "../types";
@@ -65,6 +66,12 @@ export function Scene3D({
   const sceneRef = useRef<FloodScene | null>(null);
   const projectorRef = useRef<LocalProjector | null>(null);
   const labelsRef = useRef<Sprite[]>([]);
+  /** The id the canvas itself just picked, so selection does not re-frame it. */
+  const pickedRef = useRef<string | null>(null);
+  const layersRef = useRef(layers);
+  layersRef.current = layers;
+  const [closeUp, setCloseUp] = useState(false);
+  const closeUpRef = useRef(false);
   const homeRef = useRef<{ position: Vector3; target: Vector3 } | null>(null);
   const [distance, setDistance] = useState(1);
   const [failed, setFailed] = useState<string | null>(null);
@@ -153,7 +160,8 @@ export function Scene3D({
     controls.target.set(0, 0, 0);
     controls.enableDamping = !reducedMotion;
     controls.dampingFactor = 0.08;
-    controls.minDistance = extent * 0.12;
+    // Close enough to inspect a single structure, far enough to hold the province.
+    controls.minDistance = extent * 0.004;
     controls.maxDistance = extent * 2.4;
     controls.maxPolarAngle = Math.PI / 2.06; // never below the ground plane
     controls.zoomSpeed = 0.8;
@@ -171,6 +179,23 @@ export function Scene3D({
     };
     controls.addEventListener("change", requestRender);
 
+    // Structure models authored in Blender, declared per feature in the data.
+    // A missing or broken file leaves the placeholder box in place.
+    for (const feature of data.projects.features) {
+      const url = feature.properties.modelUrl;
+      if (!url) continue;
+      loadGLB(url)
+        .then((obj) => {
+          floodScene.replaceProjectModel(feature.id, obj);
+          requestRender();
+        })
+        .catch(() => undefined);
+    }
+
+    // Below this the camera is inspecting one structure rather than reading the
+    // province, and a water sheet exaggerated x160 hangs in the air above it.
+    const CLOSE_UP_DISTANCE = extent * 0.03;
+
     const loop = () => {
       frame = requestAnimationFrame(loop);
       const now = performance.now();
@@ -186,6 +211,19 @@ export function Scene3D({
 
       // Keep the plates legible whatever the camera does.
       const d = camera.position.distanceTo(controls.target);
+
+      const near = d < CLOSE_UP_DISTANCE;
+      if (near !== closeUpRef.current) {
+        closeUpRef.current = near;
+        setCloseUp(near);
+      }
+      // The channels are drawn x12 wide for province-scale legibility, which at
+      // this range is a 900 m slab across the view. Both exaggerations step
+      // aside while a single structure is being inspected.
+      floodScene.setLayerVisible("water-surface", layersRef.current["water-surface"] && !near);
+      floodScene.setLayerVisible("waterways", layersRef.current.waterways && !near);
+      for (const sprite of labelsRef.current) sprite.visible = !near;
+
       const labelHeight = d * 0.017;
       for (const sprite of labelsRef.current) {
         sprite.scale.set(labelHeight * (sprite.userData.aspect as number), labelHeight, 1);
@@ -225,7 +263,9 @@ export function Scene3D({
       );
       raycaster.setFromCamera(ndc, camera);
       const hit = raycaster.intersectObjects(floodScene.pickables, true)[0];
-      onSelectProject((hit?.object.userData?.id as string) ?? null);
+      const id = (hit?.object.userData?.id as string) ?? null;
+      pickedRef.current = id;
+      onSelectProject(id);
     };
     const canvas = renderer.domElement;
     canvas.addEventListener("pointerdown", onPointerDown);
@@ -263,7 +303,10 @@ export function Scene3D({
   useEffect(() => {
     const scene = sceneRef.current;
     if (!scene) return;
-    (Object.keys(layers) as LayerId[]).forEach((id) => scene.setLayerVisible(id, layers[id]));
+    const exaggerated = new Set<LayerId>(["water-surface", "waterways"]);
+    (Object.keys(layers) as LayerId[]).forEach((id) =>
+      scene.setLayerVisible(id, layers[id] && !(closeUpRef.current && exaggerated.has(id))),
+    );
   }, [layers]);
 
   useEffect(() => {
@@ -271,7 +314,25 @@ export function Scene3D({
   }, [depths]);
 
   useEffect(() => {
-    sceneRef.current?.setSelected(selectedProjectId);
+    const scene = sceneRef.current;
+    const camera = cameraRef.current;
+    const controls = controlsRef.current;
+    scene?.setSelected(selectedProjectId);
+    if (!scene || !camera || !controls || !selectedProjectId) return;
+
+    // A structure picked on the canvas is already under the cursor; anything
+    // chosen from the list or the tour gets framed, otherwise you are told
+    // about a structure you cannot see.
+    if (pickedRef.current === selectedProjectId) {
+      pickedRef.current = null;
+      return;
+    }
+    const target = scene.positionOf(selectedProjectId);
+    if (!target) return;
+    const offset = camera.position.clone().sub(controls.target);
+    controls.target.copy(target);
+    camera.position.copy(target).add(offset);
+    controls.update();
   }, [selectedProjectId]);
 
   useEffect(() => {
@@ -321,6 +382,8 @@ export function Scene3D({
       <div className="scene3d-hint">
         <span>Drag to orbit · right-drag to pan · scroll to zoom</span>
         <span className="tag tag-model">water ×{DEPTH_EXAGGERATION_3D} vertical</span>
+        <span className="tag tag-model">structures ×{STRUCTURE_SCALE}</span>
+        {closeUp && <span className="tag">structure view &mdash; exaggerated water and channels hidden</span>}
       </div>
       {selected && <div className="scene3d-caption">{selected.properties.name}</div>}
       <MapZoomControls

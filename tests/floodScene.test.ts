@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
-import { Scene, ShaderMaterial, Vector3, type Mesh } from "three";
+import { Raycaster, Scene, ShaderMaterial, Vector3, type Mesh } from "three";
 import { FloodScene } from "../src/three/floodScene";
 import type { FeatureCollection, FloodZoneFeature, ProjectFeature, WaterwayFeature } from "../src/types";
 
@@ -114,10 +114,12 @@ describe("FloodScene", () => {
     expect(scene.replaceProjectModel(target, imported)).toBe(true);
     expect(scene.replaceProjectModel("does-not-exist", new Scene())).toBe(false);
     const holder = scene.pickables.find((p) => p.userData.id === target)!;
-    expect(holder.children).toHaveLength(1);
-    expect(holder.children[0].userData.id).toBe(target);
+    const model = holder.children.find((c) => c.userData.kind === "project")!;
+    expect(model.userData.id).toBe(target);
     // glTF is Y-up; the overlay frame is Z-up.
-    expect(holder.children[0].rotation.x).toBeCloseTo(Math.PI / 2, 6);
+    expect(model.rotation.x).toBeCloseTo(Math.PI / 2, 6);
+    // The pick target survives the swap, so the structure stays clickable.
+    expect(holder.children.map((c) => c.userData.kind)).toContain("pick");
   });
 
   it("advances shader time only while animation is enabled", () => {
@@ -139,5 +141,79 @@ describe("FloodScene", () => {
     scene.dispose();
     expect(overlay.scene.children).toHaveLength(0);
     expect(scene.pickables).toHaveLength(0);
+  });
+});
+
+describe("structure models and pick targets", () => {
+  const modelsDir = "public/models";
+
+  it("ships a readable GLB for every model a feature references", () => {
+    const referenced = new Set(
+      projects.features.map((f) => f.properties.modelUrl).filter((u): u is string => Boolean(u)),
+    );
+    expect(referenced.size).toBeGreaterThanOrEqual(5);
+    for (const url of referenced) {
+      expect(url.startsWith("models/")).toBe(true);
+      const buf = readFileSync(url.replace(/^models\//, `${modelsDir}/`));
+      // glTF binary container: magic "glTF", version 2, length matches.
+      expect(buf.subarray(0, 4).toString("ascii")).toBe("glTF");
+      expect(buf.readUInt32LE(4)).toBe(2);
+      expect(buf.readUInt32LE(8)).toBe(buf.length);
+      expect(buf.length).toBeGreaterThan(1024);
+    }
+  });
+
+  it("gives every project a model", () => {
+    for (const f of projects.features) {
+      expect(f.properties.modelUrl, f.id).toBeTruthy();
+    }
+  });
+
+  it("puts a pickable target on every structure, raycastable from above", () => {
+    const overlay = stubOverlay();
+    const scene = new FloodScene(overlay as never, { pinHeightMeters: 2600, structureScale: 6 });
+    scene.addProjects(projects.features);
+
+    // Nothing renders in a test, so world matrices have to be resolved by hand
+    // before any ray can find the objects.
+    overlay.scene.updateMatrixWorld(true);
+
+    const raycaster = new Raycaster();
+    for (const feature of projects.features) {
+      const at = scene.positionOf(feature.id)!;
+      expect(at).not.toBeNull();
+      // Straight down the Z axis onto the placement.
+      raycaster.set(new Vector3(at.x, at.y, 40000), new Vector3(0, 0, -1));
+      const hit = raycaster.intersectObjects(scene.pickables, true)[0];
+      expect({ id: feature.id, hit: hit?.object.userData?.id }).toEqual({
+        id: feature.id,
+        hit: feature.id,
+      });
+    }
+  });
+
+  it("keeps the pin and the pick target when a model replaces the placeholder", () => {
+    const overlay = stubOverlay();
+    const scene = new FloodScene(overlay as never, { pinHeightMeters: 2600, structureScale: 6 });
+    scene.addProjects(projects.features);
+    const id = projects.features[0].id;
+
+    scene.replaceProjectModel(id, new Scene());
+    const holder = scene.pickables.find((m) => m.userData.id === id)!;
+    const kinds = holder.children.map((c) => c.userData.kind);
+    expect(kinds).toContain("pin");
+    expect(kinds).toContain("pick");
+    expect(kinds).toContain("project");
+  });
+
+  it("scales an imported model the same way as the placeholder it replaces", () => {
+    const overlay = stubOverlay();
+    const scene = new FloodScene(overlay as never, { structureScale: 6 });
+    scene.addProjects(projects.features);
+    const id = projects.features[0].id;
+    const model = new Scene();
+    scene.replaceProjectModel(id, model);
+    expect(model.scale.x).toBe(6);
+    expect(model.rotation.x).toBeCloseTo(Math.PI / 2, 6);
   });
 });

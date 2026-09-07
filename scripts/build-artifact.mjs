@@ -42,6 +42,27 @@ const data = Object.fromEntries(
   Object.entries(DATASETS).map(([key, file]) => [key, JSON.parse(readFileSync(join(dataDir, file), "utf8"))]),
 );
 
+// Structure models are separate files the page cannot fetch once it is a single
+// document, so inline each referenced GLB as a data URI and rewrite the feature.
+const modelCache = new Map();
+let inlinedModelBytes = 0;
+for (const feature of data.projects?.features ?? []) {
+  const url = feature.properties?.modelUrl;
+  if (!url || url.startsWith("data:")) continue;
+  if (!modelCache.has(url)) {
+    const buf = readFileSync(join(root, "public", url));
+    if (buf.subarray(0, 4).toString("ascii") !== "glTF") {
+      throw new Error(`${url} is not a GLB file`);
+    }
+    modelCache.set(url, `data:model/gltf-binary;base64,${buf.toString("base64")}`);
+    inlinedModelBytes += buf.length;
+  }
+  feature.properties.modelUrl = modelCache.get(url);
+}
+if (modelCache.size) {
+  console.log(`  inlined ${modelCache.size} models, ${(inlinedModelBytes / 1024).toFixed(0)} kB`);
+}
+
 const js = readFileSync(join(dist, "app.js"), "utf8");
 const css = readFileSync(join(dist, "app.css"), "utf8");
 
