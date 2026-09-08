@@ -9,8 +9,6 @@ const Scene3D = lazy(() =>
   import("./components/Scene3D").then((m) => ({ default: m.Scene3D })),
 );
 
-/** Which view fills the stage when there is no Google map to show. */
-type FallbackView = "scene3d" | "schematic";
 import { SchematicMap } from "./components/SchematicMap";
 import { LayerControls } from "./components/LayerControls";
 import { TimelinePanel } from "./components/TimelinePanel";
@@ -22,6 +20,13 @@ import { buildDayRecords, type DayFilter } from "./lib/eventDays";
 import { loadAppData } from "./lib/dataLoader";
 import { pointInRing } from "./lib/geo";
 import { LAYER_ORDER } from "./lib/palette";
+import {
+  decodeUrlState,
+  encodeUrlState,
+  hiddenLayersOf,
+  layersFromHidden,
+  type FallbackView,
+} from "./lib/urlState";
 import {
   compareTideCounterfactual,
   qualitativeCheck,
@@ -66,8 +71,12 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dayFilter, setDayFilter] = useState<DayFilter>("all");
   const [fallbackView, setFallbackView] = useState<FallbackView>("scene3d");
+  const [shareStatus, setShareStatus] = useState<"idle" | "copied" | "error">("idle");
 
   const sceneRef = useRef<FloodScene | null>(null);
+  const shareTimeoutRef = useRef<number | null>(null);
+  /** True once the one-time read of the incoming URL has been applied. */
+  const hydratedFromUrlRef = useRef(false);
 
   const reducedMotion = useReducedMotion();
   const webglOk = useWebGLSupport();
@@ -124,6 +133,84 @@ export default function App() {
     for (const s of data?.sources.sources ?? []) map[s.id] = s;
     return map;
   }, [data]);
+
+  // ---------------------------------------------------------------- deep links
+  // A URL like ?d=2026-08-12&p=demo-ps-hagonoy-sto-rosario&f=flood&off=river-works
+  // opens straight onto that day, that project selected, the flood filter and
+  // one layer hidden. Applied once, the moment the data it needs is available.
+  useEffect(() => {
+    if (!data || hydratedFromUrlRef.current) return;
+    hydratedFromUrlRef.current = true;
+
+    const incoming = decodeUrlState(window.location.search, LAYER_ORDER);
+    if (incoming.date) {
+      const idx = data.drivers.days.findIndex((d) => d.date === incoming.date);
+      if (idx >= 0) setDayIndex(idx);
+    }
+    if (incoming.projectId && data.projects.features.some((f) => f.id === incoming.projectId)) {
+      setSelectedId(incoming.projectId);
+    }
+    if (incoming.filter) setDayFilter(incoming.filter);
+    if (incoming.view) setFallbackView(incoming.view);
+    if (incoming.hiddenLayers) setLayers(layersFromHidden(LAYER_ORDER, incoming.hiddenLayers));
+  }, [data]);
+
+  // Keeps the address bar in sync with what is on screen, so the browser's own
+  // "copy link" or bookmark captures the current day, selection, filter, view
+  // and layer set. history.replaceState, never pushState - scrubbing the
+  // timeline should not fill the back button with hundreds of days. Silent
+  // while the timeline is playing or the tour is flying, since those already
+  // change dayIndex/selectedId many times a second and neither is itself part
+  // of the shareable state.
+  useEffect(() => {
+    if (!data || !hydratedFromUrlRef.current || playing || touring) return;
+    const state = {
+      date: data.drivers.days[dayIndex]?.date,
+      projectId: selectedId ?? undefined,
+      filter: dayFilter,
+      view: fallbackView,
+      hiddenLayers: hiddenLayersOf(layers),
+    };
+    const qs = encodeUrlState(state).toString();
+    const url = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
+    window.history.replaceState(null, "", url);
+  }, [data, dayIndex, selectedId, dayFilter, fallbackView, layers, playing, touring]);
+
+  const handleShare = useCallback(async () => {
+    const url = window.location.href;
+    const announce = (status: "copied" | "error") => {
+      setShareStatus(status);
+      if (shareTimeoutRef.current) window.clearTimeout(shareTimeoutRef.current);
+      shareTimeoutRef.current = window.setTimeout(() => setShareStatus("idle"), 2500);
+    };
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error("Clipboard API unavailable");
+      await navigator.clipboard.writeText(url);
+      announce("copied");
+    } catch {
+      // Older browsers, or a non-secure context, don't expose navigator.clipboard.
+      try {
+        const input = document.createElement("textarea");
+        input.value = url;
+        input.style.cssText = "position:fixed;top:-1000px;opacity:0";
+        document.body.appendChild(input);
+        input.focus();
+        input.select();
+        const ok = document.execCommand("copy");
+        document.body.removeChild(input);
+        announce(ok ? "copied" : "error");
+      } catch {
+        announce("error");
+      }
+    }
+  }, []);
+
+  useEffect(
+    () => () => {
+      if (shareTimeoutRef.current) window.clearTimeout(shareTimeoutRef.current);
+    },
+    [],
+  );
 
   // --------------------------------------------------------------- playback
   useEffect(() => {
@@ -247,14 +334,19 @@ export default function App() {
             <strong>All project markers and flood scenarios are demonstration data.</strong>
           </p>
         </div>
-        <button
-          type="button"
-          className="btn small sidebar-toggle"
-          onClick={() => setSidebarOpen((v) => !v)}
-          aria-expanded={sidebarOpen}
-        >
-          {sidebarOpen ? "Close panels" : "Panels"}
-        </button>
+        <div className="header-actions">
+          <button type="button" className="btn small" onClick={handleShare} aria-live="polite">
+            {shareStatus === "copied" ? "Link copied" : shareStatus === "error" ? "Copy failed" : "Copy link"}
+          </button>
+          <button
+            type="button"
+            className="btn small sidebar-toggle"
+            onClick={() => setSidebarOpen((v) => !v)}
+            aria-expanded={sidebarOpen}
+          >
+            {sidebarOpen ? "Close panels" : "Panels"}
+          </button>
+        </div>
       </header>
 
       <main className="layout">

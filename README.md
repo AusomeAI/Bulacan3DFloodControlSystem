@@ -36,8 +36,9 @@ normally.
 npm run build    # typecheck + production build into dist/
 npm run preview  # serve the build
 npm run build:single  # one standalone HTML file with the data embedded
-npm test         # 64 unit tests: model, counterfactual, day records, scene,
-                 # structure models and pick targets, viewport, data integrity
+npm test         # 90 unit tests: model, counterfactual, day records, scene,
+                 # structure models and pick targets, viewport, shareable URL
+                 # state, the service worker's own guarantees, data integrity
 npm run lint     # typecheck only
 ```
 
@@ -120,6 +121,9 @@ API key or Map ID.
 | **Reduced motion** | `prefers-reduced-motion` disables flow animation, ripples and camera flights; the timeline still steps, instantly. |
 | **Fallback** | No API key, no Map ID, no WebGL, or a Maps load failure → the SVG schematic, plus setup instructions. |
 | **Responsive** | Two-column desktop layout collapses to a single column with a panel toggle below 900 px. |
+| **Pinch-to-zoom** | The schematic map takes a two-finger pinch like any map app: spread to zoom in, centred on the fingers' midpoint; drop to one finger and it becomes a plain drag without missing a beat. Works alongside the existing wheel-zoom, drag-pan and keyboard controls — all four drive the same `viewport.ts` arithmetic. |
+| **Shareable links** | The URL always names what's on screen — the selected day, the selected project, the day-filter, the schematic/3D view, and which layers are off — via `history.replaceState` (never `pushState`, so scrubbing the timeline doesn't fill your back button). *Copy link* in the header puts it on the clipboard. Playback and camera flights are deliberately **not** encoded — reopening a link lands on that state at rest, not mid-animation. |
+| **Works offline, installable** | A service worker (`public/sw.js`) caches the app shell, every dataset and every structure model on first visit. Reload with the network off and the whole app — 3D scene, layers, timeline, flood model, project details — still works; verified with a real offline browser context, not asserted. `manifest.webmanifest` makes it installable as a standalone app. Skips itself in dev (would fight Vite's HMR) and in the single-file build (nothing to fetch). |
 
 ---
 
@@ -320,19 +324,23 @@ features as demonstration placeholders like every other feature.
 
 ```
 public/data/          replaceable JSON + GeoJSON, fetched at runtime
-blender/              generate_structures.py, normalise_model.py (bpy)
 public/models/        generated GLB structure models
-scripts/              gen-timeline.mjs — regenerates the schematic driver series
+public/icons/          PWA icon set + its SVG source
+public/sw.js           service worker: offline caching for the credential-free path
+public/manifest.webmanifest   installability
+blender/              generate_structures.py, normalise_model.py (bpy)
+scripts/              gen-timeline.mjs (driver series), render-icons.mjs (PWA icons)
 src/lib/              flood model, correlation, day records, viewport pan/zoom,
+                      shareable URL state, service-worker registration guard,
                       data loading, geometry, palette
 src/three/            FloodScene (ribbons, structures, water surface, pins),
                       LocalProjector for the credential-free scene, GLB loader
 src/components/       MapView (Maps + WebGLOverlayView), Scene3D (orbit camera
-                      on a plain canvas), SchematicMap, and the layer /
-                      date-navigator / timeline / tour / details panels
+                      on a plain canvas), SchematicMap (pan/zoom/pinch), and the
+                      layer / date-navigator / timeline / tour / details panels
 src/hooks/            Maps loader, reduced motion, WebGL detection, media queries
-tests/                model, counterfactual, day-record, viewport, scene and
-                      data-integrity tests
+tests/                model, counterfactual, day-record, viewport, scene,
+                      URL-state, service-worker and data-integrity tests
 ```
 
 `MapView`, `Scene3D` and three.js are lazy-loaded. A browser with no WebGL never
@@ -343,6 +351,62 @@ anything that offers a `Scene` and a lat/lng-to-metres projection — which
 Google's `ThreeJSOverlayView` satisfies structurally, and so does
 `LocalProjector`. That is why the rivers, structures and water surface are
 identical in both, and why the scene can be tested headlessly against a stub.
+
+---
+
+## Offline and installable
+
+`public/sw.js` is a hand-written service worker, not a build-time precache
+plugin — deliberately, since Vite content-hashes the JS/CSS filenames on every
+build and a worker can't precache what it doesn't yet know the name of. Two
+strategies instead, chosen by what changes and how often:
+
+- **App shell and hashed bundles** — network-first, so a redeploy is seen the
+  moment you're online, falling back to whatever is cached when you're not.
+  Deep-link query strings (`?d=...&p=...`) are stripped before the cache is
+  keyed, so an offline reload of *any* shared link finds the one cached
+  document rather than missing because the query string doesn't match exactly.
+- **`public/data/*` and `public/models/*`** — stable, hand-authored filenames
+  (per the README's own "replace this file" instructions), so they use
+  stale-while-revalidate: answer instantly from cache, refresh it in the
+  background for next time.
+
+It never touches a cross-origin request — that one `if (url.origin !==
+self.location.origin) return` is what keeps the Google Maps script, and the API
+key on its query string, out of the cache entirely; `tests/serviceWorker.test.ts`
+asserts the guard is actually present in the shipped file, not just in the
+intent. Registration (`src/lib/serviceWorker.ts`) skips itself in `npm run dev`
+(a cache-first worker and Vite's HMR fight each other), in the single-file
+artifact build (there's no `sw.js` sitting next to it), and on any non-http(s)
+origin.
+
+Try it: `npm run build && npm run preview`, load the page once, then take the
+network offline and reload. The 3D scene, every layer, the date navigator, the
+flood model and the details panel all keep working — verified in this repo
+with a real offline browser context (`browserContext.setOffline(true)`), not
+merely asserted.
+
+`public/manifest.webmanifest` makes the page installable as a standalone app,
+with an icon set rendered from `public/icons/icon-source.svg` (regenerate via
+`node scripts/render-icons.mjs`, which needs the `playwright` package — not
+otherwise a dependency of this app — to rasterize it).
+
+## Shareable state
+
+The address bar always names what's on screen: which day (`d`), which project
+is selected (`p`), the date-navigator's filter (`f`), the schematic-vs-3D view
+(`v`), and which layers are hidden (`off`) — see `src/lib/urlState.ts` for the
+exact encoding, kept framework-free so it's unit-testable without a DOM. Only
+fields that differ from their default appear, so the plain root URL still means
+"the default view." *Copy link* in the header puts the current URL on the
+clipboard (with a manual `execCommand` fallback for contexts without the async
+Clipboard API).
+
+Two things are deliberately **not** in the URL: whether the timeline is
+playing, and whether the camera tour is mid-flight. Reopening a shared link
+should land you on the state it names, at rest — not surprise you with
+playback already running. The sync effect skips writing while either is
+active, and resumes the moment they stop.
 
 ## Accessibility
 

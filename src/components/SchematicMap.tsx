@@ -120,19 +120,94 @@ export function SchematicMap({
     return () => svg.removeEventListener("wheel", onWheel);
   }, [base, toMap]);
 
-  // Drag to pan. A press that barely moves stays a click on a marker.
+  // Drag to pan with one pointer, pinch to zoom+pan with two - the gesture a
+  // touch user expects from any map. Mouse and single-finger touch share the
+  // same drag path; a second finger touching down promotes it to a pinch.
   const drag = useRef<{ id: number; x: number; y: number; moved: boolean } | null>(null);
+  const pointers = useRef<Map<number, { x: number; y: number }>>(new Map());
+  const pinch = useRef<{ distance: number; midX: number; midY: number } | null>(null);
   const suppressClick = useRef(false);
   const [panning, setPanning] = useState(false);
 
+  const pinchGeometry = (pts: { x: number; y: number }[]) => ({
+    distance: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y),
+    midX: (pts[0].x + pts[1].x) / 2,
+    midY: (pts[0].y + pts[1].y) / 2,
+  });
+
+  /**
+   * Capture is a nice-to-have - it lets a finger keep steering the gesture
+   * after sliding outside the SVG's bounds. `setPointerCapture` can throw
+   * ("No active pointer with the given id is found") when the UA's own
+   * pointer bookkeeping and this component's disagree even briefly, which
+   * happens across real browser/OS combinations, not only in synthetic
+   * events. Losing capture must never abort the rest of the gesture handler -
+   * that would strand mid-pinch state with no way to finish the gesture.
+   */
+  const tryCapture = (id: number) => {
+    try {
+      svgRef.current?.setPointerCapture(id);
+    } catch {
+      // Fall through: the gesture still tracks via pointermove/pointerup as
+      // long as the finger stays over the element, just without capture.
+    }
+  };
+
+  const tryRelease = (id: number) => {
+    try {
+      svgRef.current?.releasePointerCapture(id);
+    } catch {
+      // Already released, or never actually captured - nothing to undo.
+    }
+  };
+
   const onPointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
-    if (e.button !== 0) return;
-    // Capture is claimed only once a drag actually starts: capturing here would
-    // retarget the click away from the marker under the cursor.
-    drag.current = { id: e.pointerId, x: e.clientX, y: e.clientY, moved: false };
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    if (pointers.current.size === 0) suppressClick.current = false; // fresh gesture
+    pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pointers.current.size === 2) {
+      // A second finger landed: hand off from single-pointer drag to pinch.
+      // Capture both fingers so the gesture tracks even if they slide outside
+      // the SVG's bounds - a pinch has no marker under it to click through to.
+      drag.current = null;
+      for (const id of pointers.current.keys()) tryCapture(id);
+      const rect = svgRef.current?.getBoundingClientRect();
+      const pts = [...pointers.current.values()];
+      if (rect) {
+        pinch.current = pinchGeometry(pts.map((p) => ({ x: p.x - rect.left, y: p.y - rect.top })));
+      }
+      setPanning(true);
+      suppressClick.current = true;
+    } else if (pointers.current.size === 1) {
+      // Capture is claimed only once a drag actually starts: capturing here
+      // would retarget the click away from the marker under the cursor.
+      drag.current = { id: e.pointerId, x: e.clientX, y: e.clientY, moved: false };
+    }
   };
 
   const onPointerMove = (e: React.PointerEvent<SVGSVGElement>) => {
+    if (!pointers.current.has(e.pointerId)) return;
+    pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pointers.current.size === 2 && pinch.current) {
+      const rect = svgRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const pts = [...pointers.current.values()].map((p) => ({ x: p.x - rect.left, y: p.y - rect.top }));
+      const now = pinchGeometry(pts);
+      const prev = pinch.current;
+      pinch.current = now;
+      setViewport((vp) => {
+        const scaleFactor = prev.distance > 4 && now.distance > 4 ? now.distance / prev.distance : 1;
+        const anchor = toMap(rect.left + now.midX, rect.top + now.midY) ?? { x: vp.x + vp.w / 2, y: vp.y + vp.h / 2 };
+        const zoomed = zoomAbout(vp, base, scaleFactor, anchor.x, anchor.y);
+        const dxMap = ((prev.midX - now.midX) / rect.width) * zoomed.w;
+        const dyMap = ((prev.midY - now.midY) / rect.height) * zoomed.h;
+        return panBy(zoomed, base, dxMap, dyMap);
+      });
+      return;
+    }
+
     const d = drag.current;
     if (!d || d.id !== e.pointerId) return;
     const dxPx = e.clientX - d.x;
@@ -141,7 +216,7 @@ export function SchematicMap({
     if (!d.moved) {
       d.moved = true;
       setPanning(true);
-      svgRef.current?.setPointerCapture(e.pointerId);
+      tryCapture(e.pointerId);
     }
     const rect = svgRef.current?.getBoundingClientRect();
     if (!rect) return;
@@ -153,10 +228,23 @@ export function SchematicMap({
   };
 
   const endDrag = (e: React.PointerEvent<SVGSVGElement>) => {
+    pointers.current.delete(e.pointerId);
+
+    if (pointers.current.size < 2) {
+      pinch.current = null;
+    }
+    if (pointers.current.size === 1) {
+      // One finger remains after a pinch: resume as a plain drag from here,
+      // rather than jumping to the pinch midpoint's old baseline.
+      const [[id, pt]] = pointers.current;
+      drag.current = { id, x: pt.x, y: pt.y, moved: true };
+      return;
+    }
+
     const d = drag.current;
     if (d?.id !== e.pointerId) return;
     if (d.moved) {
-      svgRef.current?.releasePointerCapture(e.pointerId);
+      tryRelease(e.pointerId);
       // The click that follows a drag is the end of the drag, not a selection.
       suppressClick.current = true;
     }
